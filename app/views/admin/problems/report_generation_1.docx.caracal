@@ -1,0 +1,290 @@
+#变量
+@startTime = Time.parse(params[:query_from_date]).strftime('%Y年%m月%d日')
+@endTime = Time.parse(params[:query_to_date]).strftime('%Y年%m月%d日')
+@times = (DateTime.parse(params[:query_to_date]) - DateTime.parse(params[:query_from_date])).to_i
+@today = Time.new.strftime('%Y年%m月%d日')
+
+
+    docx.style do
+        id  'title'
+        name '标题'
+        type '仿宋_GB2312'
+        bold    true
+        align   'center'
+    end
+    docx.style do
+        id 'questionTitle'
+        name '警务行为问题标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 26
+        bold true
+    end
+    docx.style do
+        id 'imgTitle'
+        name '问题图片标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 24
+    end
+    docx.style do
+        id 'topTitle'
+        name 'topTitle'
+        type '仿宋_GB2312'
+        size  27
+    end
+    docx.style do
+        id  'bottomTitle'
+        name 'bottomTitle'
+        type '仿宋_GB2312'
+        size  30
+	bold true
+	align 'center'
+    end
+    docx.style do
+        id 'textStyle'
+        name 'textStyle'
+        type '仿宋_GB2312'
+        size  27
+        indent_first 600
+    end
+
+    docx.style do
+       id 'textStyle2'
+       name 'textStyle2'
+       type '仿宋_GB2312'
+       size  27
+       indent_first 200
+    end
+
+
+    docx.style do
+        id 'top'
+        name 'top'
+        type '方正小标宋简体'
+        color  'red'
+        size    110
+        bold    true
+        align   'center'
+    end
+    docx.style do
+        id 'bottom'
+        name 'bottom'
+        type '仿宋_GB2312'
+        size 27
+        align 'right'
+    end
+    docx.style do
+        id 'top2'
+        name 'top2'
+        align    'center'
+        bold      true
+        size      45
+        type '黑体'
+    end
+    docx.style do
+        id 'top3'
+        name 'top3'
+        type '仿宋_GB2312'
+        align    'center'
+        size      26
+    end
+    docx.style do
+        id 'footer'
+        name 'footer'
+        type '仿宋_GB2312'
+        size 26
+        indent_first 600
+        bold true
+    end
+    docx.page_numbers true do
+        align :center
+        label ''
+        size 24
+        label_size 24
+        number_size 20
+    end
+
+
+
+
+#top-title
+    docx.p
+    docx.p
+    docx.img image_url('/admin/images/admin_logo.png') do
+        width   50
+        height  50
+        align   :center
+    end
+    docx.p
+    docx.p
+    docx.p
+    docx.h1 @current_location_title do
+	size 46
+	style 'title'
+    end
+    docx.p @startTime+' - '+@endTime do
+	size 20
+	style 'title'
+    end
+    docx.p '研判分析报告' do
+	size 26
+	style 'title'
+    end
+    docx.p
+    #body1
+        docx.p
+        docx.p
+        docx.p
+
+
+#top-table
+    docx.p
+    docx.p
+    docx.table [['疑似问题总数','确定问题总数'], [@resources.size,@resources.where(problem_status: 'correcting'..'corrected').size]],border_size:4 do
+    cell_style rows[0], bold: true
+    cell_style cols[0], width: 5000
+    cell_style cols[1], width: 5000
+    cell_style cells, size: 16, align: 'center', margins: { top: 200, bottom: 0, left:0, right: 0 }
+    end
+    docx.p
+    docx.p
+    docx.p
+    docx.table [['待核实','整改中','已整改','市局审核','无效问题'],[@resources.where(problem_status: 'waiting').size,@resources.where(problem_status: 'correcting').size,@resources.where(problem_status: 'corrected').size,@resources.where(problem_status: 'reviewing').size,@resources.where(problem_status: 'negated').size]],border_size:4 do
+    cell_style cols[0], width: 2000, bold: true
+    cell_style cols[1], width: 2000, bold: true
+    cell_style cols[2], width: 2000, bold: true
+    cell_style cols[3], width: 2000, bold: true
+    cell_style cols[4], width: 2000, bold: true
+    cell_style cells,size: 16, align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+    end
+    docx.p
+    docx.p
+    docx.p
+    docx.table [['智能预警','极速巡查','手动创建','现场督察','其它问题'],[@resources.where(discover_type: 'vision').size,@resources.where(discover_type: 'search').size,@resources.where(discover_type: 'manual').size,@resources.where(discover_type: 'field').size,@resources.where(discover_type: 'other').size]],border_size:4 do
+    cell_style cols[0], width: 2000, bold: true
+    cell_style cols[1], width: 2000, bold: true
+    cell_style cols[2], width: 2000, bold: true
+    cell_style cols[3], width: 2000, bold: true
+    cell_style cols[4], width: 2000, bold: true
+    cell_style cells,size: 16, align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+    end
+
+    #body3
+        docx.p
+        docx.p
+        docx.p
+        docx.p
+        docx.ul do
+        li '问题数据分析' do
+            size   29
+            bold   true
+        end
+        end
+        docx.p '通过对'+@startTime+'至'+@endTime+'期间'+'视频巡察中发现的问题数据进行归纳整理，并针对发现问题的地区和单位进行研判分析，现整理出问题数据分析若干，具体划分为以下几点：' do
+            style 'textStyle'
+        end
+#body3-1
+    docx.p
+    docx.p do
+         style 'textStyle2'
+         text '（一）个别问题高频易发,前三名依次为：',bold: true
+    end
+
+@category.first(3).each do |k,v|
+    docx.p do
+        style 'textStyle'
+        text k rescue nil
+        text '，所有问题共计'
+        text v rescue nil
+        text '个。'
+     end
+end
+     docx.p
+     @category.first(3).each do |k,v|
+     docx.table [[k,v]],border_size:4 do
+  	 cell_style cols[0], width: 6000, bold: true
+ 	 cell_style cols[1], width: 2000, bold: true
+	 cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+	 end
+     end
+#body3-2
+    docx.p
+    docx.p do
+         style 'textStyle2'
+         text '（二）下级单位问题较多,前三名依次为：',bold: true
+    end
+@location_pro.first(3).each do |k,v|
+    if v != 0
+        docx.p do
+            style 'textStyle'
+            text k
+            text '（'
+            text Location.where(name: k)[0].parent.name.to_s
+            text '）'
+            text '，所有问题共计'
+            text v
+            text '个。'
+          end
+     end
+end
+     docx.p
+    @location_pro.first(3).each do |k,v|
+    if v != 0
+         docx.table [[k+'（'+ Location.where(name: k)[0].parent.name.to_s + '）',v]],border_size:4 do
+         cell_style cols[0], width: 6000, bold: true
+         cell_style cols[1], width: 2000, bold: true
+         cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+	 end
+	 end
+     end
+#body3-3
+    docx.p
+    docx.p do
+         style 'textStyle2'
+         text '（三）已确定督察问题整理：',bold: true
+    end
+
+         docx.p @startTime+'至'+@endTime+'期间，在视频巡查中各地区共发现各类已核实问题共'+@resources.where(problem_status: 'correcting'..'corrected').size.to_s+'个，（整理如下）：'      do
+             style 'textStyle'
+         end
+    docx.p
+    docx.p
+    @resources.where(problem_status: 'correcting'..'corrected').each do |resource|
+         docx.p resource.issued_at.strftime('20%y年%m月%d日 %H时%M分') + '，'+ Location.find(resource.location.id).parent.parent.name.to_s + ' '+ Location.find(resource.location.id).parent.name.to_s + ' '+ resource.location.name  + '存在  “' + (resource.problem_category.name rescue '未知问题类型')+ '”  问题。 [' + (resource.problem_status === 'correcting' ? '未整改':'已整改') + ']'   do
+             style 'imgTitle'
+         end
+    end
+
+
+#bottom
+    docx.p
+    docx.p @bottom do
+        style 'textStyle'
+    end
+    docx.p
+    docx.p '本次研判分析跨时段'+@times.to_s+'天，累计发现疑似问题'+@resources.size.to_s+'个，共确定问题'+@resources.where(problem_status: 'correcting'..'corrected').size.to_s+'个，其中未整改'+@resources.where(problem_status: 'correcting').size.to_s+'个，已整改'+@resources.where(problem_status: 'corrected').size.to_s  do
+        style 'bottomTitle'
+        text '个，重点摘要信息如下：'
+        end
+    docx.p
+    docx.table [['突出问题类型','问题突出地区'],[(@category.first(1)[0][0] rescue nil), (@location_pro.first(1)[0][0] rescue nil)]],border_size:4 do
+  	cell_style cols[0], width: 4000, bold: true
+ 	cell_style cols[1], width: 4000, bold: true
+	 cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+    end
+    docx.p
+    docx.p  do
+        text '各地督察部门要认真贯彻执行上级公安机关派法的督察任务和督察方案，全力履行职责，及时查纠防范各类问题，服务党的安保工作，维稳大局。'
+        style 'textStyle'
+    end
+    docx.p
+    docx.p
+    docx.p
+    docx.p
+    docx.p @publishing_unit + '公安局' do
+       style 'bottom'
+    end
+    docx.p @today do
+       style 'bottom'
+    end

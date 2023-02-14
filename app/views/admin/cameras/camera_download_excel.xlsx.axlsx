@@ -1,0 +1,16 @@
+wb = xlsx_package.workbook
+
+wb = xlsx_package.workbook
+
+
+wb.add_worksheet(name: "cameras") do |sheet|
+
+  header = ['省', '市', '区县', '单位', '房间', '摄像头', 'RTSP地址', '场所类型', '房间类型']
+
+  sheet.add_row header
+
+  @resources.each do |camera|
+      sheet.add_row [(camera.location.parent.parent.parent.parent.name rescue nil), (camera.location.parent.parent.parent.name rescue nil), (camera.location.parent.parent.name rescue nil), (camera.location.parent.name rescue nil), (camera.location.name rescue nil), (camera.name rescue nil), (camera.rtsp rescue nil), (camera.location.location_category.parent.name rescue nil), (camera.location.location_category.name rescue nil)]
+  end
+
+end

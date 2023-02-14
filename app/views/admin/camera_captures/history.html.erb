@@ -1,0 +1,32 @@
+<% content_for :filter_form do %>
+  <%= tag.div class: 'row' do %>
+    <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+      <%= tag.div (manage_collection_select_tag location_level.name, "query_location_id_#{location_level.index}", params["query_location_id_#{location_level.index}"],
+                                                Location.where(id: Location.find(current_admin_user.source.location.id).subtree_ids ).where(location_levels: location_level), :id, :name, { include_blank: '全部' }), class: 'col-md-3' %>
+    <% end %>
+    <%= tag.div (manage_datetime_tag '开始时间', :query_from_date, params[:query_from_date]), class: 'col-md-3' %>
+    <%= tag.div (manage_datetime_tag '结束时间', :query_to_date, params[:query_to_date]), class: 'col-md-3' %>
+  <% end %>
+<% end %>
+
+<% content_for :th do %>
+  <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+    <%= tag.th location_level.name %>
+  <% end %>
+  <%= tag.th CameraCapture.human_attribute_name(:created_at) %>
+  <%= tag.th CameraCapture.human_attribute_name(:id) %>
+  <%= tag.th CameraCapture.human_attribute_name(:img) %>
+<% end %>
+
+
+<%= render 'manage/resources/index' do |resource| %>
+  <% LocationLevel.where('index < 4 AND index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+    <%= content_tag(:td, (resource.location.path.where(location_level: location_level).first.name rescue nil)) %>
+  <% end %>
+  <%= tag.td (resource.location.name rescue nil) %>
+  <%= tag.td (resource.created_at.strftime('%F %T') rescue nil) %>
+  <%= tag.td (resource.id rescue nil) %>
+  <td>
+    <img class="image-preview" height="100"  src="<%= resource.img_data[:src] rescue ''%>" onerror="this.src='/admin/images/image_error.png'"/>
+  </td>
+<% end %>

@@ -1,0 +1,186 @@
+<div class="content">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card card-stats">
+        <div class="card-header">
+          <h4 class="title">问题追溯
+            <div class="pull-right box-tools">
+              <button type="button" class="btn btn-sm btn-success create-problem-modal-button-history">
+                创建督察问题
+              </button>
+            </div>
+          </h4>
+        </div>
+        <div class="card-body pt-1">
+          <table class="table table-bordered">
+            <tbody class="text-center">
+            <tr>
+              <td style="width: 10%; color: #1c8cf7!important;">地区</td>
+              <td style="width: 38%"><%= @resource.camera.location.parent.parent.parent.name rescue nil %></td>
+              <td style="width: 10%; color: #1c8cf7!important;">房间</td>
+              <td style="width: 42%"><%= @resource.location.name rescue nil %></td>
+            </tr>
+            <tr>
+              <td style="width: 10%; color: #1c8cf7!important;">单位</td>
+              <td><%= @resource.camera.location.parent.name rescue nil %></td>
+              <td style="width: 10%; color: #1c8cf7!important;">监控点</td>
+              <td><%= @resource.camera.name rescue nil %></td>
+            </tr>
+            <tr>
+              <td style="width: 10%; color: #1c8cf7!important;">时间</td>
+              <td><%= @resource.created_at.strftime('%F %T') %></td>
+              <td style="width: 10%; color: #1c8cf7!important;">设备信息</td>
+              <td><%= link_to '查看设备详情', url_for({ controller: 'admin/cameras', action: :show, id: @resource.camera.id }) rescue nil %></td>
+            </tr>
+            </tbody>
+          </table>
+
+          <div class="mt-2">
+            <a href="#<%= 'href_id_' + @resource.id.to_s %>" title="点击图片追，右侧溯到至同一时刻">
+              <%= image_tag @resource.img_data[:src], width: '100%' rescue nil %>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-stats">
+        <div class="card-header">
+          <h4 class="title">相同房间追溯</h4>
+        </div>
+        <div class="card-body pt-1 mx-3">
+          <% @resource.camera.location.cameras.where.not(id: @resource.camera_id).each do |camera| %>
+            <div class="mb-3">
+              <h4 class="mb-1"><%= camera.name %></h4>
+              <div class="slider">
+
+                <% CameraCapture.query_created_at_from((@resource.created_at - 2.hours).strftime('%F %T'))
+                                .query_created_at_to((@resource.created_at + 2.hours).strftime('%F %T'))
+                                .where(camera: camera)
+                                .order(created_at: :desc).with_attached_img.each do |camera_capture| %>
+                  <div>
+                    <%= image_tag camera_capture.img_data[:src], width: '100%', class: 'image-preview px-2 w-100', 'data-capture-id': camera_capture.id rescue nil %>
+                    <h6 class="my-1 px-2 text-info">
+                      <i class="tim-icons icon-time-alarm pr-2"></i>
+                      <%= camera_capture.created_at.strftime('%F %T') %>
+                      <div data-capture-img-id="<%= camera_capture.id %>" class="d-inline-block float-right trace-back-images-add text-white btn-info create-problem-capture-add-img-button create-problem-capture-add-img-btn-style">+</div>
+                    </h6>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-lg-4 card admin-camera-capture-trace-back">
+      <div class="card card-stats card-timeline card-plain">
+        <div class="card-header">
+          <h4 class="title">相同监控追溯</h4>
+        </div>
+        <div class="card-body trace-back-images-container pl-2 m-0">
+          <ul class="timeline timeline-simple">
+
+            <% CameraCapture.query_created_at_from((@resource.created_at - 1.hours).strftime('%F %T'))
+                            .query_created_at_to((@resource.created_at + 1.hours).strftime('%F %T'))
+                            .where(camera: @resource.camera)
+                            .order(created_at: :desc).with_attached_img.each do |camera_capture| %>
+
+              <% if camera_capture.id == @resource.id %>
+
+                <li class="timeline-inverted p-0 m-0">
+                  <div class="timeline-badge success">
+                    <i class="tim-icons icon-shape-star"></i>
+                  </div>
+                  <div class="timeline-panel text-right">
+                    <div class="timeline-body">
+                      <%= image_tag camera_capture.img_data[:src], width: '100%', class: 'image-preview', 'data-capture-id': camera_capture.id, id: ('href_id_' + camera_capture.id.to_s)  rescue nil %>
+                    </div>
+                    <div class="timeline-footer text-left mt-3 position-relative">
+                      <div class="text-success">
+                        <i class="tim-icons icon-time-alarm pr-2"></i><%= camera_capture.created_at.strftime('%F %T') %>
+                      </div>
+                      <% @mark_problem_img_id = camera_capture.id  %>
+                      <div data-capture-img-id="<%= camera_capture.id %>" class="trace-back-images-add text-white btn-info create-problem-capture-add-img-button create-problem-capture-add-img-active">+</div>
+                    </div>
+                  </div>
+                </li>
+
+              <% else %>
+
+                <li class="timeline-inverted p-0 m-0">
+                  <div class="timeline-badge info">
+                    <i class="tim-icons icon-camera-18"></i>
+                  </div>
+                  <div class="timeline-panel text-right">
+                    <div class="timeline-body">
+                      <%= image_tag camera_capture.img_data[:src], width: '100%', class: 'image-preview', 'data-capture-id': camera_capture.id, id: ('href_id_' + camera_capture.id.to_s)  rescue nil %>
+                    </div>
+                    <div class="timeline-footer text-left mt-3 position-relative">
+                      <div class="text-info">
+                        <i class="tim-icons icon-time-alarm pr-2"></i><%= camera_capture.created_at.strftime('%F %T') %>
+                      </div>
+                      <div data-capture-img-id="<%= camera_capture.id %>" class="trace-back-images-add text-white btn-info create-problem-capture-add-img-button ">+</div>
+                    </div>
+                  </div>
+                </li>
+              <% end %>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= render 'admin/camera_captures/mark_problem_module' %>
+
+<script>
+
+  $('#problem_location_id').val(<%= @resource.location.id %>);
+<!--  $('#problem_camera_capture_ids').val(<%#= @mark_problem_img_id %>);-->
+
+  $('.slider').slick({
+    slidesToShow: 4,
+    slidesToScroll: 1,
+  });
+
+  $(document).ready(function(){
+
+    window.location.href="#<%= 'href_id_' + @resource.id.to_s %>"
+
+  });
+
+
+
+  $(document).on('click', '.create-problem-capture-add-img-button', function () {
+    if ($(this).hasClass('create-problem-capture-add-img-active')) {
+      $(this).removeClass('create-problem-capture-add-img-active')
+    } else {
+      $(this).addClass('create-problem-capture-add-img-active')
+    }
+    console.log(mark_problem_img_ids().join(','))
+    $('#problem_camera_capture_ids').val(mark_problem_img_ids().join(','));
+  });
+
+  $('#problem_camera_capture_ids').val(mark_problem_img_ids().join(','));
+
+  function mark_problem_img_ids() {
+    let capture_img_ids = []
+    $('.create-problem-capture-add-img-active').each(function (key, item) {
+      capture_img_ids.push($(item).data('capture-img-id'))
+    })
+    return capture_img_ids;
+  }
+
+  $(document).on('ajax:success', '#mark-problem-form', function (e, data, status, xhr) {
+    let problem_last_id = $('.data-problem-last-id-content').data('problem-last-id')
+    $('#create-problem-modal').modal('hide')
+    window.open("/admin/problems/" + (problem_last_id+1) + "?locale=zh-CN");
+  });
+
+  $(document).on('ajax:error', '#mark-problem-form', function (e, data, status, xhr) {
+
+  });
+</script>

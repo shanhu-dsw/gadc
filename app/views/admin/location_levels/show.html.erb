@@ -1,0 +1,4 @@
+<%= render 'manage/resources/show' do |resource| %>
+  <%= content_tag(:tr, content_tag(:td, LocationLevel.human_attribute_name(:name)) + content_tag(:td, resource.name)) %>
+  <%= content_tag(:tr, content_tag(:td, LocationEvent.human_attribute_name(:created_at)) + content_tag(:td, resource.created_at.strftime('%F %T'))) %>
+<% end %>

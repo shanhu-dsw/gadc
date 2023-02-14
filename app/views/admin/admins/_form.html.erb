@@ -1,0 +1,31 @@
+<% content_for :information do %>
+  <%= tag.div class: 'row' do %>
+
+
+    <%= content_tag(:div, manage_text_field(form, :full_name), class: 'col-md-6') %>
+    <% if current_admin_user.source.role == 'superadmin' %>
+      <%= tag.div (manage_select_field form, :role, human_attribute_enum(:admin, Admin.roles.keys, :role), { include_blank: true }), class: 'col-md-6' %>
+      <%= content_tag(:div, manage_collection_select_field(form, :location_id, Location.joins(:location_level).where.not(location_levels: { name: '房间' }), :id, :name, { include_blank: true }), class: 'col-md-6') %>
+    <% else %>
+      <%= content_tag(:div, manage_collection_select_field(form, :location_id, Location.joins(:location_level).where.not(location_levels: { name:  '房间' }).where(id: Location.find(current_admin_user.source.location.id).subtree_ids ), :id, :name, { include_blank: true }), class: 'col-md-6') %>
+      <%= manage_hidden_field form, :role, :staff %>
+    <% end %>
+
+
+    <% @resource.build_user unless @resource.user %>
+
+    <%= form.fields_for :user do |f| %>
+      <%= content_tag(:div, manage_text_field(f, :username), class: 'col-md-6') %>
+      <% if current_admin_user.source.role == 'superadmin' || params[:target] || action_name == 'new' %>
+        <%= content_tag(:div, manage_password_field(f, :password), class: 'col-md-6') %>
+        <%= content_tag(:div, manage_password_field(f, :password_confirmation), class: 'col-md-6') %>
+      <% end %>
+    <% end %>
+
+  <% end %>
+<% end %>
+
+<%= render 'manage/resources/form', form: form, sections: { information: '基本信息' } %>
+
+
+

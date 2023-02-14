@@ -1,0 +1,25 @@
+<% sections.each do |key, value| %>
+  <% if content_for?(key) %>
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="card-title mb-4"><%= value %></h4>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <%= yield key %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-12 mt-3 text-center">
+        <%= form.submit '提交', class: 'btn btn-info' %>
+      </div>
+    </div>
+  </div>
+</div>

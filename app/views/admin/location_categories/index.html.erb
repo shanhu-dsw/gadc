@@ -1,0 +1,72 @@
+<% if params[:type] === 'tree' %>
+
+  <div class="content">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        <h3 class="title mb-0">
+          <i class="tim-icons icon-align-center pr-2"></i><%= @model.model_name.human %><%= t 'manage.resources.list' %>
+        </h3>
+        <div>
+          <%= link_to url_for({ action: :index, type: '' }) do %>
+            <button type="button" class="btn btn-primary upload-cameras-modal-button mr-2">
+              切换模式
+            </button>
+          <% end %>
+          <button class="btn btn-success create-location-modal-button">
+            <%= (t 'manage.resources.create') %>
+          </button>
+        </div>
+      </div>
+      <div class="card-body" id="tree-root" style="min-height: 80vh;" data-id="<%= 0 %>">
+      </div>
+    </div>
+  </div>
+
+  <%= render 'layouts/manage/modal', modal_id: 'create-location-modal', title: '创建场所类型' do %>
+    <%= form_with(model: LocationCategory.new, url: { action: :create }, local: false, html: { class: 'form-resource' }) do |form| %>
+      <%= tag.div class: 'modal-body' do %>
+        <%= tag.div class: 'row' do %>
+          <%= form.hidden_field :parent_id %>
+          <%= tag.div (manage_text_field form, :name), class: 'col-md-12' %>
+          <%= tag.div (manage_number_field form, :index), class: 'col-md-12' %>
+        <% end %>
+      <% end %>
+      <%= tag.div class: 'modal-footer' do %>
+        <%= button_tag '关闭', class: "btn btn-secondary", type: "button", "data-bs-dismiss": "modal" %>
+        <%= submit_tag '提交', class: "btn btn-primary" %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <div id="edit-location-category-modal-container"></div>
+
+<% else %>
+  <% content_for :filter_form do %>
+    <%= tag.div class: 'row' do %>
+      <%= tag.div (manage_text_tag '名称', :query_name, params[:query_name]), class: 'col-md-4' %>
+      <%= tag.div (manage_select_tag '上级', :query_parent, params[:query_parent], options_from_collection_for_select(LocationCategory.where(ancestry: nil), :id, :name, params: [:query_parent]), include_blank: '全部'), class: 'col-md-4' %>
+      <%= tag.div (manage_select_tag '序号', :query_level, params[:query_level], options_for_select([1,2,3,4,5]), include_blank: '全部'), class: 'col-md-4' %>
+    <% end %>
+  <% end %>
+
+  <% content_for :th do %>
+    <%= tag.th LocationCategory.human_attribute_name(:name) %>
+    <%= tag.th LocationCategory.human_attribute_name(:parent) %>
+    <%= tag.th LocationCategory.human_attribute_name(:index) %>
+  <% end %>
+
+  <% content_for :tools do %>
+    <%= link_to url_for({ action: :index, type: 'tree' }) do %>
+      <button type="button" class="btn btn-primary upload-cameras-modal-button mr-2">
+        切换模式
+      </button>
+    <% end %>
+  <% end %>
+
+  <%= render 'manage/resources/index' do |resource| %>
+    <%= tag.td resource.name %>
+    <%= tag.td (resource.parent.name rescue nil) %>
+    <%= tag.td resource.index %>
+  <% end %>
+
+<% end %>

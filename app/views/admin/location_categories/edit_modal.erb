@@ -1,0 +1,15 @@
+<%= render 'layouts/manage/modal', modal_id: 'edit-location-category-modal', title: '更改场所类型' do %>
+  <%= form_with(model: @resource, url: { action: :update }, local: false, html: { class: 'form-location' }) do |form| %>
+    <%= tag.div class: 'modal-body' do %>
+      <%= tag.div class: 'row' do %>
+        <%= form.hidden_field :parent_id %>
+        <%= tag.div (manage_text_field form, :name), class: 'col-md-12' %>
+        <%= tag.div (manage_number_field form, :index), class: 'col-md-12' %>
+      <% end %>
+    <% end %>
+    <%= tag.div class: 'modal-footer' do %>
+      <%= button_tag '关闭', class: "btn btn-secondary", type: "button", "data-bs-dismiss": "modal" %>
+      <%= submit_tag '提交', class: "btn btn-primary" %>
+    <% end %>
+  <% end %>
+<% end %>

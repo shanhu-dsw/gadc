@@ -1,0 +1,62 @@
+<div class="modal fade" id="create-problem-modal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content data-problem-last-id-content " data-problem-last-id="<%= Problem.last.id rescue 0%>" style="background-color: #262a3c">
+      <%= form_with(model: Problem.new, url: { controller: :problems, action: :create, }, id: 'mark-problem-form', local: false, html: { class: 'location' }) do |form| %>
+        <div class="modal-header">
+          <h4 class="modal-title text-white" id="exampleModalLabel">创建督察问题</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-white">
+          <%= tag.div class: 'row mark-problem-modal-capture' do %>
+
+            <%= tag.div (manage_collection_select_tag '问题大类', :problem_category_0, nil, ProblemCategory.roots, :id, :name, { include_blank: true }), class: 'col-md-12' %>
+            <%= tag.div (manage_collection_select_tag '问题中类', :problem_category_1, nil, [], :id, :name, { include_blank: true }), class: 'col-md-12' %>
+            <%= tag.div (manage_collection_select_tag '问题小类', :problem_category_2, nil, [], :id, :name, { include_blank: true }), class: 'col-md-12' %>
+            <%= tag.div (manage_collection_select_field form, :problem_category_id, [], :id, :name, { include_blank: true }), class: 'col-md-12' %>
+
+            <%= manage_hidden_field form, :location_id, 1 %>
+            <%= manage_hidden_field form, :admin_id, @current_admin_user.source.id %>
+            <%= manage_hidden_field form, :issued_at, Time.now %>
+            <%= manage_hidden_field form, :discover_type, :search %>
+            <%= manage_hidden_field form, :problem_status, :correcting %>
+            <%= hidden_field_tag :problem_camera_capture_ids, '' %>
+            <%= tag.div (manage_text_area_field form, :note), class: 'col-md-12' %>
+          <% end %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+          <!--            <button type="button" class="btn btn-primary">Save changes</button>-->
+          <%#= button_tag (t "manage.resources.close"), class: "btn btn-secondary", type: "button", "data-bs-dismiss": "modal" %>
+          <%= submit_tag (t "manage.resources.submit"), class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
+
+
+<%#= render 'layouts/manage/modal', modal_id: 'create-problem-modal', title: 'Create Problem' do %>
+<%#= form_with(model: Problem.new, url: { controller: :problems, action: :create, }, local: false, html: { class: 'form-resource' }) do |form| %>
+<%#= tag.div class: 'modal-body' do %>
+<%#= tag.div class: 'row' do %>
+
+<%#= form.hidden_field :admin_id, value: current_admin_user.source_id %>
+<%#= tag.div (manage_collection_select_field form, :problem_category_id, ProblemCategory.all, :id, :name, { include_blank: true }), class: 'col-md-12' %>
+<%#= tag.div (manage_text_area_field form, :note), class: 'col-md-12' %>
+
+
+<%# end %>
+<%# end %>
+<%#= tag.div class: 'modal-footer' do %>
+<%#= button_tag (t "manage.resources.close"), class: "btn btn-secondary", type: "button", "data-bs-dismiss": "modal" %>
+<%#= submit_tag (t "manage.resources.submit"), class: "btn btn-primary" %>
+<%# end %>
+<%# end %>
+<%# end %>
+
+
+

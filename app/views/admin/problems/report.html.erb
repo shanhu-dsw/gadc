@@ -1,0 +1,104 @@
+<div class="content">
+  <div class="col-md-10 mr-auto ml-auto">
+    <div class="wizard-container">
+      <div class="card card-wizard problem-report-wizard" data-color="blue">
+        <!--        You can switch " data-color="primary" "  with one of the next bright colors: "green", "orange", "red", "blue"       -->
+        <div class="card-header text-center">
+          <h3 class="card-title">
+            生成您需要的督察报告
+          </h3>
+          <h5 class="description">智慧督察系统自动生成报告，多种选项灵活筛选</h5>
+          <div class="wizard-navigation">
+            <div class="progress-with-circle">
+              <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3" style="width: 21%;"></div>
+            </div>
+            <ul>
+              <li class="nav-item">
+                <a class="nav-link active" href="#report-generation-step1" data-toggle="tab">
+                  <i class="tim-icons icon-single-02"></i>
+                  <p style="width: 120%">选择条件</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#report-generation-step2" data-toggle="tab">
+                  <i class="tim-icons icon-settings-gear-63"></i>
+                  <p style="width: 120%">确认问题</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#report-generation-step3" data-toggle="tab">
+                  <i class="tim-icons icon-delivery-fast"></i>
+                  <p style="width: 120%">选择报告</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#report-generation-step4" data-toggle="tab">
+                  <i class="tim-icons icon-delivery-fast"></i>
+                  <p style="width: 120%">生成下载</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tab-content">
+            <div class="tab-pane show active" id="report-generation-step1">
+              <h4 class="info-text">请选择报告筛选条件</h4>
+              <div class="row mt-5">
+                <%= tag.div (manage_select_tag '问题类型', :query_problem_category_id, params[:query_problem_category_id], options_from_collection_for_select(ProblemCategory.all, :id, :name), include_blank: '全部'), class: 'col-md-4' %>
+                <%= tag.div (manage_datetime_tag '开始时间', :query_from_date, params[:query_from_date]), { class: 'col-md-4', required: true } %>
+                <%= tag.div (manage_datetime_tag '结束时间', :query_to_date, params[:query_to_date]), { class: 'col-md-4', required: true } %>
+                <%= tag.div (manage_select_tag '问题状态', :query_problem_status, params[:query_problem_status], options_for_select(human_attribute_enum(:problem, Problem.problem_statuses, :problem_status)), include_blank: '全部', multiple: true), class: 'col-md-4' %>
+                <%= tag.div (manage_select_tag '创建人', :query_admin_id, params[:query_admin_id], options_from_collection_for_select(Admin.all, :id, :full_name), include_blank: '全部'), class: 'col-md-4' %>
+              </div>
+            </div>
+            <div class="tab-pane" id="report-generation-step2">
+              <div class="row justify-content-center">
+                <div class="col-sm-12">
+                  <h4 class="info-text">请确认报告包含问题</h4>
+                </div>
+                <div class="col-12" id="report-problems">
+
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="report-generation-step3">
+              <h4 class="info-text">请选择生成报告类型</h4>
+              <div class="row pt-3 pb-4">
+                <!-- , '督察周报', '督察年报', '数据专报', '督察专报', '研判报告' -->
+                <% ['巡查报告', '研判报告', '抽查报告', '检查站专报', '督察周报', '态势分析','公务用枪专题','值班备勤专题','执法办案专题','警容风纪专题','内务管理专题','窗口服务专题'].each_with_index do |type, index| %>
+                  <div class="col-2 report-type-selection my-3">
+                    <%= radio_button_tag :query_report_type, index, :checked => index == 0 %>
+                    <%= label_tag "query_report_type_#{index}", type , id:"report_type_#{index}" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="tab-pane" id="report-generation-step4">
+              <div class="row justify-content-center">
+                <div class="col-sm-12">
+                  <h4 class="info-text">智能报告已生成并自动下载</h4>
+                </div>
+                <div class="col-sm-12 info-text">
+                  <i class="tim-icons icon-check-2" style="font-size: 90px; font-weight: 800; color: #04d481"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="pull-right">
+            <input type='button' class='btn btn-next btn-fill btn-info btn-wd' name='next' value='下一步'/>
+            <input type='button' class='btn btn-finish btn-fill btn-info btn-wd' name='finish' value='重新下载'/>
+          </div>
+          <div class="pull-left">
+            <input type='button' class='btn btn-previous btn-fill btn-info btn-wd' name='previous' value='上一步'/>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

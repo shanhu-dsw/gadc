@@ -1,0 +1,156 @@
+#变量
+@startTime = Time.parse(params[:query_from_date]).strftime('%Y年%m月%d日%H时%M分')
+@endTime = Time.parse(params[:query_to_date]).strftime('%Y年%m月%d日%H时%M分')
+@problem_size = @resources.size
+
+    docx.style do
+        id  'title'
+        name '标题'
+        type '仿宋_GB2312'
+        bold    true
+        align   'center'
+        color '#e90606'
+    end
+    docx.style do
+        id 'questionTitle'
+        name '警务行为问题标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 26
+        bold true
+    end
+    docx.style do
+        id 'imgTitle'
+        name '问题图片标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 32
+    end
+    docx.style do
+        id 'topTitle'
+        name 'topTitle'
+        type '仿宋_GB2312'
+        size  27
+    end
+    docx.style do
+        id  'bottomTitle'
+        name 'bottomTitle'
+        type '仿宋_GB2312'
+        size  30
+    bold true
+    align 'center'
+    end
+    docx.style do
+        id 'textStyle'
+        name 'textStyle'
+        type '仿宋_GB2312'
+        size  32
+        indent_first 600
+    end
+    docx.style do
+        id 'textStyle2'
+        name 'textStyle2'
+        type '仿宋_GB2312'
+        size  32
+        bold    true
+        indent_first 600
+    end
+    docx.style do
+        id 'top'
+        name 'top'
+        type '方正小标宋简体'
+        size    110
+        bold    true
+        align   'center'
+    end
+    docx.style do
+        id 'bottom'
+        name 'bottom'
+        type '仿宋_GB2312'
+        size 27
+        align 'right'
+    end
+    docx.style do
+        id 'top2'
+        name 'top2'
+        align    'center'
+        bold      true
+        size      45
+        type '黑体'
+    end
+    docx.style do
+        id 'top3'
+        name 'top3'
+        type '仿宋_GB2312'
+        align    'center'
+        size      26
+    end
+    docx.style do
+        id 'footer'
+        name 'footer'
+        type '仿宋_GB2312'
+        size 26
+        indent_first 600
+        bold true
+    end
+    docx.page_numbers true do
+        align :center
+        label ''
+        size 24
+        label_size 24
+        number_size 20
+    end
+
+#top-title
+    docx.p
+    docx.h1 '智慧视频巡查系统枪库问题专项报告' do
+    size 50
+    style 'title'
+    end
+    docx.hr do
+        size   20
+        color '#e90606'
+        spacing 4
+    end
+
+#body
+    docx.p @startTime + '至' + @endTime + '，省厅警务督察总队将公务用枪管理作为重要督察内容，建立健全公务用枪安全管理联合机制，对我省各地区单位用枪情况开展网上督察，共发现问题'+ @problem_size.to_s + '个。具体情况如下：' do
+        style 'textStyle'
+    end
+    docx.p
+    docx.p  do
+        text '一是单人进入枪库问题。'
+        style 'textStyle2'
+    end
+
+    @resources.query_problem_category_name('存在单人进入枪库现象').each do |resource|
+         docx.p resource.issued_at.strftime('20%y年%m月%d日 %H时%M分') + '，'+ Location.find(resource.location.id).parent.parent.name.to_s + ' '+ Location.find(resource.location.id).parent.name.to_s + ' '+ resource.location.name  + '存在  “' + (resource.problem_category.name rescue '未知问题类型')+ '”  问题。 [' + (t resource.problem_status) + ']'   do
+             style 'imgTitle'
+         end
+    end
+
+    docx.p
+    docx.p  do
+        text '二是武器库异动问题。'
+        style 'textStyle2'
+    end
+
+    @resources.query_problem_category_name('存在武器库异动现象').each do |resource|
+         docx.p resource.issued_at.strftime('20%y年%m月%d日 %H时%M分') + '，'+ Location.find(resource.location.id).parent.parent.name.to_s + ' '+ Location.find(resource.location.id).parent.name.to_s + ' '+ resource.location.name  + '存在  “' + (resource.problem_category.name rescue '未知问题类型')+ '”  问题。 [' + (t resource.problem_status) + ']'   do
+             style 'imgTitle'
+         end
+    end
+
+        docx.p
+        docx.p  do
+            text '三是其它枪库问题。'
+            style 'textStyle2'
+        end
+
+        @resources.query_problem_category_name('存在武器库未配备验枪桶现象').each do |resource|
+             docx.p resource.issued_at.strftime('20%y年%m月%d日 %H时%M分') + '，'+ Location.find(resource.location.id).parent.parent.name.to_s + ' '+ Location.find(resource.location.id).parent.name.to_s + ' '+ resource.location.name  + '存在  “' + (resource.problem_category.name rescue '未知问题类型')+ '”  问题。 [' + (t resource.problem_status) + ']'   do
+                 style 'imgTitle'
+             end
+        end
+
+

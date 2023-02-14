@@ -1,0 +1,54 @@
+<!-- Problem Modal -->
+<div class="modal fade modal-black" id="newest-problem-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-danger">最新问题展示</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="color: #fc4f00!important;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-white">
+        <% @latest_problems = Problem.accessible_by(current_ability, :read).where(problem_status: :waiting).order(:created_at).last(7) %>
+        <% if @latest_problems.size > 0 %>
+          <div class="table-full-width">
+            <table class="table">
+              <thead class="text-primary">
+              <tr>
+                <th>问题名称</th>
+                <th>单位</th>
+                <th style="width: 25%">生成时间</th>
+                <th>问题快照</th>
+                <th class="text-right">查看</th>
+              </tr>
+              </thead>
+              <tbody>
+              <% @latest_problems.each do |problem| %>
+                <tr>
+                  <td><%= (problem.problem_category.name rescue nil) %></td>
+                  <td><%= (problem.location.name rescue nil) %></td>
+                  <td><%= (problem.issued_at.strftime('%F %T') rescue nil) %></td>
+                  <td><%= (image_tag problem.problem_evidences.last.img_data[:src], height: '80px', class: 'image-preview' rescue nil) %></td>
+                  <td class="text-right">
+                    <%= link_to url_for({ controller: 'admin/problems', action: :show, id: problem.id },), target: '_blank' do %>
+                      <div class="btn btn-success btn-sm">查看</div>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center text-info">
+            暂无问题数据
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">返回</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<% content_for :filter_form do %>
+  <%= tag.div class: 'row' do %>
+
+    <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+      <%= tag.div (manage_collection_select_tag location_level.name, "query_location_id_#{location_level.index}", params["query_location_id_#{location_level.index}"],
+                                                Location.where(id: Location.find(current_admin_user.source.location.id).subtree_ids).where(location_levels: location_level), :id, :name, { include_blank: '全部' }), class: 'col-md-3' %>
+    <% end %>
+
+    <%= tag.div (manage_collection_select_tag '场所类型', :query_location_category_ids, params[:query_location_category_ids], LocationCategory.where(ancestry: nil), :id, :name, { include_blank: '全部' }), class: 'col-md-3' %>
+    <%= tag.div (manage_collection_select_tag '房间类型', :query_location_category_id, params[:query_location_category_id], LocationCategory.where.not(ancestry: nil), :id, :name, { include_blank: '全部' }), class: 'col-md-3' %>
+    <%= tag.div (manage_collection_select_tag '预警类型', :query_event_id, params[:query_event_id], Event.all, :id, :name, { include_blank: '全部' }), class: 'col-md-3' %>
+    <%= tag.div (manage_select_tag '有效无效', :query_active, params[:query_active], { '有效' => true, '无效' => false }, include_blank: '全部'), class: 'col-md-3' %>
+    <%= tag.div (manage_datetime_tag '开始时间', :query_created_at_from, params[:query_created_at_from]), class: 'col-md-3' %>
+    <%= tag.div (manage_datetime_tag '结束时间', :query_created_at_to, params[:query_created_at_to]), class: 'col-md-3' %>
+  <% end %>
+<% end %>
+
+<% content_for :th do %>
+  <% if (can? :change_verified, @resource) && ENV['NEED_LOCATION_EVENT_VERIFIED'] == '1' %>
+    <%= tag.th LocationEvent.human_attribute_name(:verified) %>
+  <% end %>
+  <%= tag.th LocationEvent.human_attribute_name(:active) %>
+  <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+    <%= tag.th location_level.name %>
+  <% end %>
+  <%= tag.th LocationEvent.human_attribute_name(:type) %>
+  <%= tag.th LocationEvent.human_attribute_name(:length) %>
+  <%= tag.th LocationEvent.human_attribute_name(:created_at) %>
+  <%= tag.th LocationEvent.human_attribute_name(:active_at) %>
+
+  <%= tag.th '实时截图' %>
+<% end %>
+
+
+<%= render 'manage/resources/index' do |resource| %>
+  <% if (can? :change_verified, @resource) && ENV['NEED_LOCATION_EVENT_VERIFIED'] == '1' %>
+    <td>
+      <button class="<%= resource.verified == true ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm' %>">
+        <%= resource.verified == true ? '已审核' : '未审核' %>
+      </button>
+    </td>
+  <% end %>
+  <td>
+    <button class="<%= resource.active == true ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm' %>">
+      <%= resource.active == true ? '有效' : '无效' %>
+    </button>
+  </td>
+
+  <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+    <%= content_tag(:td, (resource.location.path.where(location_level: location_level).first.name rescue nil)) %>
+  <% end %>
+
+  <td><span class="btn btn-sm btn-warning"><%= resource.event.name rescue nil %></span></td>
+  <%= content_tag(:td, (distance_of_time_in_words(resource.created_at, resource.active_at, include_seconds: true) rescue nil)) %>
+  <%= content_tag(:td, (resource.created_at.strftime('%F %T') rescue nil)) %>
+  <%= content_tag(:td, (resource.active_at.strftime('%F %T') rescue nil)) %>
+  <td>
+    <img class="image-preview" height="100" data-capture-id="<%= resource.master_camera_capture.id rescue nil %>"  src="<%= resource.master_camera_capture.img_data[:src] rescue ''%>" onerror="this.src='/admin/images/image_error.png'"/>
+  </td>
+<% end %>
+

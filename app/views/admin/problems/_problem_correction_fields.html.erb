@@ -1,0 +1,32 @@
+<div class="col-md-12 nested-fields" id="<%= f.object.sortable_id rescue nil %>">
+  <div class="row">
+
+    <div class="col-md-1 d-flex justify-content-center align-items-center">
+      <i class="fas fa-arrows-alt sortable-handle"></i>
+    </div>
+
+    <div class="col-md-2 d-flex  align-items-center justify-content-center">
+      <div class="row">
+        <%= link_to f.object.img.filename, f.object.img rescue nil %>
+      </div>
+    </div>
+
+    <div class="col-md-5 d-flex  align-items-center justify-content-center">
+      <div class="row">
+        <%= image_tag f.object.img, height: '100px' rescue nil %>
+      </div>
+    </div>
+
+<!--    <div class="col-md-2 d-flex  align-items-center justify-content-center">-->
+<!--      <div class="row">-->
+        <%#= link_to f.object.img.filename, f.object.img rescue nil %>
+<!--      </div>-->
+<!--    </div>-->
+
+    <div class="col-md-3 d-flex justify-content-end align-items-center">
+      <%= link_to_remove_association '删除', f, class: 'btn btn-danger' %>
+    </div>
+
+  </div>
+  <hr>
+</div>

@@ -1,0 +1,21 @@
+<% content_for :filter_form do %>
+  <%= tag.div class: 'row' do %>
+    <%= tag.div (manage_text_tag '标题', :query_name, params[:query_name]), class: 'col-md-3' %>
+    <%= tag.div (manage_select_tag '发布人', :query_admin_id, params[:query_admin_id], options_from_collection_for_select(Admin.all, :id, :full_name), include_blank: '全部'), class: 'col-md-3' %>
+    <%= tag.div (manage_datetime_tag '开始时间', :query_created_at_from, params[:query_created_at_from]), class: 'col-md-3' %>
+    <%= tag.div (manage_datetime_tag '结束时间', :query_created_at_to, params[:query_created_at_to]), class: 'col-md-3' %>
+  <% end %>
+<% end %>
+
+<% content_for :th do %>
+  <%= tag.th Notification.human_attribute_name(:name) %>
+  <%= tag.th Notification.human_attribute_name(:description) %>
+  <%= tag.th Notification.human_attribute_name(:admin_id) %>
+<% end %>
+
+
+<%= render 'manage/resources/index' do |resource| %>
+  <%= tag.td (resource.name rescue nil) %>
+  <%= tag.td (resource.description.length > 35 ? resource.description[0,35] + '...' : resource.description rescue nil) %>
+  <%= tag.td (resource.admin.full_name rescue nil) %>
+<% end %>

@@ -1,0 +1,26 @@
+<% content_for :information do %>
+  <%= tag.div class: 'row' do %>
+    <%= tag.div (manage_text_field form, :name), class: 'col-md-6' %>
+    <%= tag.div (manage_text_area_field form, :description), class: 'col-md-12' %>
+    <%= manage_hidden_field form, :admin_id, current_admin_user.source.id %>
+  <% end %>
+<% end %>
+
+<% content_for :notification_attachments do %>
+  <div class="row">
+    <div class="col-md-12">
+      <%= render 'manage/resources/dropzone', name: 'notification_attachment', params: { notification_id: form.object.id }, field: 'file' %>
+    </div>
+    <div class="col-md-12">
+      <div class="row notification_attachments sortable">
+        <% form.object.notification_attachments.each do |file| %>
+          <%= form.fields_for :notification_attachments, file do |f| %>
+            <%= render 'notification_attachment_fields', :f => f %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end if action_name == 'edit' %>
+
+<%= render 'manage/resources/form', form: form, sections: { information: '基本信息', notification_attachments: '通知文件' } %>

@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-body d-flex justify-content-between flex-row align-items-center">
+
+        <div style="min-width: 100px;">
+          <%#= link_to '返回', url_for({ action: :index, :page => (params[:page] ? params[:page] : 1) }), class: 'btn btn-success btn-sm' %>
+          <a class="btn btn-success btn-sm go-back">返回</a>
+        </div>
+
+        <div style="font-size: 26px; font-weight: 500; color:white;">
+          <%= action_name == 'edit' ? '编辑' : (action_name == 'new' ? '创建' : '查看') %><%= @model.model_name.human %><%= t 'manage.resources.info' %>
+        </div>
+
+        <div style="min-width: 100px;" class="text-right">
+          <%= link_to '修改', url_for({ action: :edit, id: @resource.id }), class: 'btn btn-warning btn-sm mr-2' if @resource.id && (can? :update, @resource) && action_name != 'edit' %>
+          <%= link_to '删除', ({ action: :destroy, id: @resource.id }), method: :delete, data: { confirm: '确认删除该条数据吗？' }, class: 'btn btn-danger btn-sm' if @resource.id && (can? :destroy, @resource) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

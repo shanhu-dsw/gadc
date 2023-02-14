@@ -1,0 +1,22 @@
+<div id="manage-<%= name %>-dropzone" class="dropzone"></div>
+
+<script>
+  Dropzone.autoDiscover = false;
+
+  $(document).ready(function () {
+    $("div#manage-<%= name %>-dropzone").dropzone({
+      url: '<%= url_for({controller: name.pluralize, action: :create }) %>',
+      paramName: '<%= name %>[<%= field rescue 'document' %>]',
+      params: {
+        <% params.each  do |key, value| %>
+        "<%= name %>[<%= key %>]": "<%= value %>",
+        <% end %>
+        "authenticity_token": $('meta[name=csrf-token]').attr('content')
+      },
+      parallelUploads: 1,
+      queuecomplete: function (file, response) {
+        location.reload();
+      }
+    });
+  })
+</script>

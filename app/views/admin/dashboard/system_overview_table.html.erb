@@ -1,0 +1,169 @@
+<table class="table table-striped">
+  <thead class="text-primary">
+  <tr>
+    <th class="text-center">
+      地区
+    </th>
+    <th class="text-center">
+      监控总数
+    </th>
+    <th class="text-center">
+      预警总数
+    </th>
+    <th class="text-center">
+      疑似问题总数
+    </th>
+    <th class="text-center">
+      巡查问题数
+    </th>
+    <th class="text-center" style="width: 22%;">
+      问题处理率
+    </th>
+    <th class="text-center" style="width: 22%;">
+      问题整改率
+    </th>
+    <th class="text-center" style="width: 22%;">
+      设备在线率
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td class="text-center">
+      <%= '全部' %>
+    </td>
+    <td class="text-center">
+      <%= Camera.count rescue 0 %>
+    </td>
+    <td class="text-center">
+      <%= LocationEvent.count rescue 0 %>
+    </td>
+    <td class="text-center">
+      <%= Problem.count rescue 0 %>
+    </td>
+    <td class="text-center">
+      <%= Problem.query_discover_type(:manual).count rescue 0 %>
+    </td>
+
+    <% whole_all_problems = Problem.count %>
+    <% whole_waiting_problems = Problem.query_problem_status('waiting').count %>
+    <td>
+      <div class="progress-container mx-3">
+                      <span class="progress-badge">
+                        已处理<%= whole_all_problems - whole_waiting_problems %>，未处理<%= whole_waiting_problems %>
+                      </span>
+        <% @whole_treatment_rate = 100 * (whole_all_problems - whole_waiting_problems) / whole_all_problems rescue 100 %>
+        <div class="progress">
+          <div class="progress-bar <%= get_progress_class(@whole_treatment_rate) %>"
+               style="width: <%= @whole_treatment_rate %>%;"
+               role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+            <span class="progress-value">处理率：<%= @whole_treatment_rate %>%</span>
+          </div>
+        </div>
+      </div>
+    </td>
+
+    <% whole_corrected_problems = Problem.query_problem_status('corrected').size %>
+    <% whole_correcting_problems = Problem.query_problem_status('correcting').size %>
+    <td>
+      <div class="progress-container mx-3">
+        <span class="progress-badge">已整改<%= whole_corrected_problems %>，整改中<%= whole_correcting_problems %></span>
+        <% @whole_rectification_rate = 100 * whole_corrected_problems / (whole_corrected_problems + whole_correcting_problems) rescue 100 %>
+        <div class="progress">
+          <div class="progress-bar <%= get_progress_class(@whole_rectification_rate) %>"
+               style="width: <%= @whole_rectification_rate %>%;"
+               role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+            <span class="progress-value">整改率：<%= @whole_rectification_rate %>%</span>
+          </div>
+        </div>
+      </div>
+    </td>
+    <% whole_normal_cameras = Camera.query_status('normal').size %>
+    <% whole_offline_cameras = Camera.query_status('offline').size %>
+    <% whole_corrupted_cameras = Camera.query_status('corrupted').size %>
+    <td>
+      <div class="progress-container mx-3">
+          <span class="progress-badge">在线<%= whole_normal_cameras %>，离线<%= whole_offline_cameras %>
+            ，低质量<%= whole_corrupted_cameras %></span>
+        <% @whole_online_rate = 100 * (whole_normal_cameras + whole_corrupted_cameras) / (whole_normal_cameras + whole_offline_cameras + whole_corrupted_cameras) rescue 100 %>
+        <div class="progress">
+          <div class="progress-bar <%= get_progress_class(@whole_online_rate) %>" style="width: <%= @whole_online_rate %>%;"
+               role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+            <span class="progress-value">在线率：<%= @whole_online_rate %>%</span>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <% current_admin_user.source.location && current_admin_user.source.location.children.each do |location| %>
+    <tr>
+      <td class="text-center">
+        <%= location.name %>
+      </td>
+      <td class="text-center">
+        <%= location.all_descendant_cameras.size %>
+      </td>
+      <td class="text-center">
+        <%= location.all_descendant_location_events.size %>
+      </td>
+      <td class="text-center">
+        <%= location.all_descendant_problems.size %>
+      </td>
+      <td class="text-center">
+        <%= location.all_descendant_problems.query_discover_type(:manual).size %>
+      </td>
+
+      <% all_problems = location.all_descendant_problems.size %>
+      <% waiting_problems = location.all_descendant_problems.query_problem_status('waiting').size %>
+      <td>
+        <div class="progress-container mx-3">
+                      <span class="progress-badge">
+                        已处理<%= all_problems - waiting_problems %>，未处理<%= waiting_problems %>
+                      </span>
+          <% @treatment_rate = 100 * (all_problems - waiting_problems) / all_problems rescue 100 %>
+          <div class="progress">
+            <div class="progress-bar <%= get_progress_class(@treatment_rate) %>"
+                 style="width: <%= @treatment_rate %>%;"
+                 role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+              <span class="progress-value">处理率：<%= @treatment_rate %>%</span>
+            </div>
+          </div>
+        </div>
+      </td>
+
+      <% corrected_problems = location.all_descendant_problems.query_problem_status('corrected').size %>
+      <% correcting_problems = location.all_descendant_problems.query_problem_status('correcting').size %>
+      <td>
+        <div class="progress-container mx-3">
+          <span class="progress-badge">已整改<%= corrected_problems %>，整改中<%= correcting_problems %></span>
+          <% @rectification_rate = 100 * corrected_problems / (corrected_problems + correcting_problems) rescue 100 %>
+          <div class="progress">
+            <div class="progress-bar <%= get_progress_class(@rectification_rate) %>"
+                 style="width: <%= @rectification_rate %>%;"
+                 role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+              <span class="progress-value">整改率：<%= @rectification_rate %>%</span>
+            </div>
+          </div>
+        </div>
+      </td>
+      <% normal_cameras = location.all_descendant_cameras.query_status('normal').size %>
+      <% offline_cameras = location.all_descendant_cameras.query_status('offline').size %>
+      <% corrupted_cameras = location.all_descendant_cameras.query_status('corrupted').size %>
+      <td>
+        <div class="progress-container mx-3">
+          <span class="progress-badge">在线<%= normal_cameras %>，离线<%= offline_cameras %>
+            ，低质量<%= corrupted_cameras %></span>
+          <% @online_rate = 100 * (normal_cameras + corrupted_cameras) / (normal_cameras + offline_cameras + corrupted_cameras) rescue 100 %>
+          <div class="progress">
+            <div class="progress-bar <%= get_progress_class(@online_rate) %>" style="width: <%= @online_rate %>%;"
+                 role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+              <span class="progress-value">在线率：<%= @online_rate %>%</span>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
