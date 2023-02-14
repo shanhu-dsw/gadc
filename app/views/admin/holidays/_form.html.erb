@@ -1,7 +1,0 @@
-<% content_for :information do %>
-  <%= tag.div class: 'row' do %>
-    <%= tag.div (manage_date_field form, :off_date), class: 'col-md-6' %>
-  <% end %>
-<% end %>
-
-<%= render 'manage/resources/form', form: form, sections: { information: '基本信息' } %>

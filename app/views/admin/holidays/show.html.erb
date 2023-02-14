@@ -1,4 +1,0 @@
-<%= render 'manage/resources/show' do |resource| %>
-  <%= content_tag(:tr, content_tag(:td, Holiday.human_attribute_name(:off_date)) + content_tag(:td, (resource.off_date rescue nil))) %>
-  <%= content_tag(:tr, content_tag(:td, LocationEvent.human_attribute_name(:created_at)) + content_tag(:td, resource.created_at.strftime('%F %T'))) %>
-<% end %>

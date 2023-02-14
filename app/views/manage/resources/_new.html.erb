@@ -1,8 +1,0 @@
-<div class="content">
-  <%= render 'manage/resources/nav' %>
-
-
-  <%= form_with(model: @resource, url: { action: :create }, local: false, html: { class: 'form-resource' }) do |form| %>
-    <%= yield form %>
-  <% end %>
-</div>
