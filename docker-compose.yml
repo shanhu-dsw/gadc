@@ -1,0 +1,11 @@
+version: "2.3"
+services:
+  gadc:
+    image: gadc
+    container_name: gadc
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+  postgres:
+    image: postgres:13.2
+    container_name: postgres

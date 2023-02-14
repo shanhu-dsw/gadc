@@ -1,0 +1,151 @@
+<%= content_for :right_content do %>
+  <div class="card mb-1">
+    <div class="card-header">
+      <h4 class="card-title">抓拍记录</h4>
+    </div>
+    <div class="card-body overflow-container" style="height: 80vh;overflow: scroll;">
+      <% @resource.camera_captures.order(created_at: :desc).each do |camera_capture| %>
+        <div class="mb-4">
+          <img width="100%" src="<%= camera_capture.img_data[:src] rescue '' %>" onerror="this.src='/admin/images/image_error.png'"/>
+          <%#= image_tag camera_capture.img_data[:src], width: '100%' %>
+          <span class="badge badge-info mt-3"><%= camera_capture.created_at.strftime('%F %T') %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+
+
+<%= render 'manage/resources/show' do |resource| %>
+  <% resource.location.path.each do |location| %>
+    <%= content_tag(:tr, content_tag(:td, location.location_level.name) + content_tag(:td, (location.name rescue nil))) %>
+  <% end %>
+
+  <%= content_tag(:tr, content_tag(:td, LocationEvent.human_attribute_name(:type)) + content_tag(:td, (resource.event.name rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, LocationEvent.human_attribute_name(:created_at)) + content_tag(:td, resource.created_at.strftime('%F %T'))) %>
+  <%= content_tag(:tr, content_tag(:td, LocationEvent.human_attribute_name(:active_at)) + content_tag(:td, (resource.active_at.strftime('%F %T') rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, LocationEvent.human_attribute_name(:length)) + content_tag(:td, ((distance_of_time_in_words(resource.created_at, resource.active_at, include_seconds: true)) rescue nil))) %>
+  <% if current_admin_user.source.role != 'staff' %>
+    <tr>
+      <td>房间信息</td>
+      <td>
+        <%= link_to '查看房间', url_for({ controller: 'admin/locations', action: :show, id: @resource.location_id }) rescue nil %>
+      </td>
+    </tr>
+    <tr>
+      <td>是否生成督察问题</td>
+      <td>
+        <% if !resource.problem_id %>
+          未生成
+        <% else %>
+          <%= link_to '已生成督察问题', url_for({ controller: 'admin/problems', action: :show, id: resource.problem_id },), target: '_blank' %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  <tr>
+    <td>是否有效</td>
+    <td>
+      <% if resource.active %>
+        <div class="btn btn-sm btn-danger mx-1">有效</div>
+      <% else %>
+        <div class="btn btn-sm btn-success mx-1">无效</div>
+      <% end %>
+    </td>
+  </tr>
+
+  <% if current_admin_user.source.role != 'staff' %>
+    <tr>
+      <td>
+        修改预警状态
+      </td>
+
+      <td>
+        <%= form_with(model: @resource, url: url_for({ action: :change_active, id: @resource.id, active: false }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :active, value: false %>
+          <%= form.submit '点击改为无效预警', class: "btn btn-sm btn-success float-left mx-1" %>
+        <% end if @resource.active == true %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :change_active, id: @resource.id, active: true }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :active, value: true %>
+          <%= form.submit '点击改为有效预警', class: "btn btn-sm btn-danger float-left mx-1" %>
+        <% end if @resource.active == false %>
+      </td>
+    </tr>
+  <% end %>
+
+  <% if (can? :change_verified, @resource) && ENV['NEED_LOCATION_EVENT_VERIFIED'] == '1' %>
+    <tr>
+      <td>是否审核</td>
+      <td>
+        <% if resource.verified %>
+          <div class="btn btn-sm btn-danger mx-1">已审核</div>
+        <% else %>
+          <div class="btn btn-sm btn-success mx-1">未审核</div>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        修改审核状态
+      </td>
+      <td>
+        <%= form_with(model: @resource, url: url_for({ action: :change_verified, id: @resource.id, verified: false }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :verified, value: false %>
+          <%= form.submit '更改为未审核预警', class: "btn btn-sm btn-success float-left mx-1" %>
+        <% end if @resource.verified == true %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :change_verified, id: @resource.id, verified: true }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :verified, value: true %>
+          <%= form.submit '点击改为审核预警', class: "btn btn-sm btn-danger float-left mx-1" %>
+        <% end if @resource.verified == false %>
+    </tr>
+  <% end %>
+
+  <% if current_admin_user.source.role == 'superadmin' %>
+    <tr>
+      <td>
+        近期预警总数
+      </td>
+      <td>
+<!--        <div class="btn btn-sm btn-secondary mx-1" style="min-width: 142px ">-->
+        <div class="mx-1 " style="min-width: 142px ">
+          三天内共计触发<span class="text-danger"> <%= LocationEvent.query_created_at_from((Time.zone.now.beginning_of_day - 3.day).to_s).where(location_id: @resource.location_id).query_event_id(@resource.event_id).count %> </span>次
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        删除预警模型
+      </td>
+      <td>
+        <%
+          alert_exist = false
+          alert_arr = []
+          @resource.location.event_locations.each do |event|
+            if event.event_id == @resource.event.id
+              alert_exist = true
+            else
+              alert_arr.push(event.event_id.to_s)
+            end
+          end
+        %>
+
+
+        <%= form_with(model: @resource, url: url_for({ action: :change_event, id: @resource.id, setting_event_ids: alert_arr, location_id: @resource.location.id }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :active, value: false %>
+          <%= form.submit '点击停止该项预警', class: "btn btn-sm btn-info float-left mx-1" %>
+        <% end if alert_exist == true %>
+
+        <% if !alert_exist %>
+          <div class="btn btn-sm btn-dark mx-1">该项预警已被停止</div>
+        <% end %>
+
+      </td>
+    </tr>
+  <% end %>
+
+<% end %>

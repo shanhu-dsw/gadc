@@ -1,0 +1,38 @@
+<% @resources.each do |resource| %>
+  <div class="tree-node" data-id="<%= resource.id %>">
+    <div class="d-flex flex-row align-items-center pb-2">
+      <button class="btn btn-sm btn-dark tree-switch"><i class="fas fa-chevron-right"></i></button>
+      <button class="btn btn-sm btn-primary mx-2" style="min-width: 20vh;"><%= resource.name %></button>
+
+      <%= link_to ({ action: 'destroy', id: resource.id }), method: :delete, data: { confirm: (t 'manage.resources.delete_confirmation') }, class: 'btn btn-sm btn-danger' do %>
+        <i class="fa fa-trash"></i>
+      <% end if can? :delete, resource %>
+
+      <% if can? :edit, resource %>
+        <button type=button class="btn btn-sm btn-warning ml-2 tree-node-edit">
+          <i class="fa fa-edit"></i>
+        </button>
+      <% end %>
+
+      <% if can? :create, @model %>
+        <button type=button class="btn btn-sm btn-success ml-2 tree-node-new">
+          <i class="fa fa-plus"></i>
+        </button>
+      <% end %>
+
+    </div>
+
+    <div class="ml-3 pl-3 tree-node-children">
+
+    </div>
+  </div>
+<% end %>
+
+<div class="ml-3 pl-2 tree-node-cameras">
+  <%# @resource.cameras.each do |camera| %>
+<!--    <div style="width: 20vh">-->
+      <%#= image_tag camera.master_camera_capture.img_data[:src], width: '100%', class: 'image-preview' rescue nil %>
+<!--      <div class="text-info mt-1"><%#= camera.name %></div>-->
+<!--    </div>-->
+  <%# end %>
+</div>

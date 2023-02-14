@@ -1,0 +1,36 @@
+<%= content_for :right_content do %>
+  <div class="card mb-1">
+    <div class="card-header">
+      <h4 class="card-title">通知文件</h4>
+    </div>
+    <div class="card-body overflow-container" style="height: 80vh;overflow: scroll;">
+      <table class="table table-bordered">
+        <thead class="text-center text-danger">
+        <tr>
+          <td>通知文件名称</td>
+          <td>上传时间</td>
+          <td style="width: 15%">下载地址</td>
+        </tr>
+        </thead>
+        <tbody class="text-center">
+        <% @resource.notification_attachments.order(created_at: :desc).each do |notification_attachment| %>
+          <tr>
+            <td style="color: #1c8cf7!important;"><%= notification_attachment.file.filename %></td>
+            <td style="color: #1c8cf7!important;"><%= notification_attachment.created_at.strftime('%F %T') %></td>
+            <td style="color: #1c8cf7!important;"><%= link_to '下载', url_for(notification_attachment.file) %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  </div>
+<% end %>
+
+<%= render 'manage/resources/show' do |resource| %>
+  <%= content_tag(:tr, content_tag(:td, Notification.human_attribute_name(:name)) + content_tag(:td, (resource.name rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, Notification.human_attribute_name(:admin_id)) + content_tag(:td, (resource.admin.full_name rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, Notification.human_attribute_name(:created_at)) + content_tag(:td, resource.created_at.strftime('%F %T'))) %>
+  <%= content_tag(:tr, content_tag(:td, Notification.human_attribute_name(:description)) + content_tag(:td, (resource.description rescue nil))) %>
+<% end %>

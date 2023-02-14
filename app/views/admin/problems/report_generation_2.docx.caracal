@@ -1,0 +1,257 @@
+#变量
+@startTime = Time.parse(params[:query_from_date]).strftime('%m月%d日0时0分')
+@endTime = Time.parse(params[:query_to_date]).strftime('%m月%d日23时59分')
+@times = (DateTime.parse(params[:query_to_date]) - DateTime.parse(params[:query_from_date])).to_i
+@today = Time.new.strftime('%m月%d日')
+
+
+    docx.style do
+        id  'title'
+        name '标题'
+        type '仿宋_GB2312'
+        align   'center'
+    end
+    docx.style do
+        id  'nav'
+        name '标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 32
+    end
+    docx.style do
+        id 'questionTitle'
+        name '警务行为问题标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 26
+        bold true
+    end
+    docx.style do
+        id 'imgTitle'
+        name '问题图片标题'
+        type '仿宋_GB2312'
+        indent_first 600
+        size 24
+    end
+    docx.style do
+        id 'topTitle'
+        name 'topTitle'
+        type '仿宋_GB2312'
+        size 32
+        indent_first 600
+    end
+    docx.style do
+        id  'bottomTitle'
+        name 'bottomTitle'
+        type '仿宋_GB2312'
+        size  30
+	bold true
+	align 'center'
+    end
+    docx.style do
+        id 'textStyle'
+        name 'textStyle'
+        type '仿宋_GB2312'
+        size  27
+        indent_first 600
+    end
+
+    docx.style do
+       id 'textStyle2'
+       name 'textStyle2'
+       type '仿宋_GB2312'
+       size  27
+       indent_first 200
+    end
+
+
+    docx.style do
+        id 'top'
+        name 'top'
+        type '方正小标宋简体'
+        color  'red'
+        size    110
+        bold    true
+        align   'center'
+    end
+    docx.style do
+        id 'bottom'
+        name 'bottom'
+        type '仿宋_GB2312'
+        size 27
+        align 'right'
+    end
+    docx.style do
+        id 'top2'
+        name 'top2'
+        align    'center'
+        bold      true
+        size      45
+        type '黑体'
+    end
+    docx.style do
+        id 'top3'
+        name 'top3'
+        type '仿宋_GB2312'
+        align    'center'
+        size      26
+    end
+    docx.style do
+        id 'footer'
+        name 'footer'
+        type '仿宋_GB2312'
+        size 26
+        indent_first 600
+        bold true
+    end
+    docx.page_numbers true do
+        align :center
+        label ''
+        size 24
+        label_size 24
+        number_size 20
+    end
+
+
+
+
+#top-title
+    docx.h1 '网上督察暨智慧督察系统巡查抽查情况' do
+	size 50
+	style 'title'
+    end
+    docx.p
+    docx.p
+    docx.p '按照公安部工作部署和教育整顿督察方案要求，'+@today+'，省厅警务督察总队组织全省网上督察人员，对智慧督察系统自动筛查脱空岗、单人讯询问等敏感问题苗头进行了即时响应制止，并对各地落实值班备勤、内部管理、执法办案区管理使用、枪支管理等情况进行了极速巡查，省厅同步进行了抽查。情况如下：' do
+	size 32
+	style 'nav'
+    end
+    docx.p '一、问题处置情况' do
+	size 32
+	style 'nav'
+    end
+    docx.p @startTime.to_s+'至'+@endTime.to_s+'，系统推送问题中，各下级地区问题统计如下：' do
+        style 'nav'
+    end
+    docx.p
+    docx.table [['下级地区','疑似问题总数','处置问题数','确定问题总数','整改问题数','未核实问题数','未整改问题数']],border_size:4 do
+             cell_style cols[0], width: 2200, bold: true
+             cell_style cols[1], width: 1300, bold: true
+             cell_style cols[2], width: 1300, bold: true
+             cell_style cols[3], width: 1300, bold: true
+             cell_style cols[4], width: 1300, bold: true
+             cell_style cols[5], width: 1300, bold: true, color: '#cc0202'
+             cell_style cols[6], width: 1300, bold: true, color: '#cc0202'
+        cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+    end
+    @location_pro.each do |k,v|
+         docx.table [[Location.find(k).name,v.size,v.where(problem_status: 'correcting'..'corrected').size+v.where(problem_status: 'negated'..'reviewing').size,v.where(problem_status: 'correcting'..'corrected').size,v.where(problem_status: 'corrected').size,v.where(problem_status: 'waiting').size,v.where(problem_status: 'correcting').size]],border_size:4 do
+             cell_style cols[0], width: 2200, bold: true
+             cell_style cols[1], width: 1300, bold: true
+             cell_style cols[2], width: 1300, bold: true
+             cell_style cols[3], width: 1300, bold: true
+             cell_style cols[4], width: 1300, bold: true
+             cell_style cols[5], width: 1300, bold: true, color: '#cc0202'
+             cell_style cols[6], width: 1300, bold: true, color: '#cc0202'
+             cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+         end
+	end
+    docx.p
+    docx.p
+    docx.p '在以上系统推送问题中，筛选出已确定存在的问题，再次进行分析，对多发问题进行统计，得出各下级地区突出问题如下：' do
+        style 'nav'
+    end
+    docx.p
+    docx.table [['下级地区','显著问题类型']],border_size:4 do
+             cell_style cols[0], width: 2200, bold: true
+             cell_style cols[1], width: 7800, bold: true
+        cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+    end
+    @location_pro.each do |k,v|
+         docx.table [[Location.find(k).name,(v.where(problem_status: 'correcting'..'corrected').group_by { |j| j.problem_category.name rescue '未知问题类型'}.map { |k, v| [k, v.size] }.sort_by { |v| -v[1] }.first(1)[0][0].to_s+'，共计：'+v.where(problem_status: 'correcting'..'corrected').group_by { |j| j.problem_category.name rescue '未知问题类型'}.map { |k, v| [k, v.size] }.sort_by { |v| -v[1] }.first(1)[0][1].to_s+'个' rescue '未发现督察问题')]],border_size:4 do
+             cell_style cols[0], width: 2200, bold: true
+             cell_style cols[1], width: 7800, bold: true
+             cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+         end
+	end
+    docx.p
+    docx.p '二、下级巡查情况' do
+	size 32
+	style 'nav'
+    end
+    docx.p '省厅部署要求各地使用极速巡查模块，加大巡查力度和密度，即时查纠问题，坚决防止基层带病作业。'+@startTime.to_s+'至'+@endTime.to_s+'，系统问题中，各下级地区主动使用极速巡查发现的问题统计如下：' do
+        style 'nav'
+    end
+    docx.p
+    docx.table [['下级地区','主动巡查问题数量']],border_size:4 do
+             cell_style cols[0], width: 5000, bold: true
+             cell_style cols[1], width: 5000, bold: true
+             cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+    end
+    @location_pro.each do |k,v|
+         docx.table [[Location.find(k).name,v.joins(:admin).where(admins:{location_id: k}).size]],border_size:4 do
+             cell_style cols[0], width: 5000, bold: true
+             cell_style cols[1], width: 5000, bold: true
+             cell_style cells, size: 16,align: 'center', margins: { top: 200, bottom: 0, left: 0, right: 0 }
+         end
+	 end
+    docx.p
+    docx.p '三、抽查情况' do
+	size 32
+	style 'nav'
+    end
+    docx.p '在使用极速巡查抽查各下级地区时，发现各地区仍存在顽瘴痼疾，以下问题仍比较严重：' do
+        style 'nav'
+    end
+    docx.p
+    @search_pro.each do |k,v|
+        if v.size != 0
+            docx.ul do
+                li ProblemCategory.find(k).name do
+                    size   29
+                    bold   true
+                end
+            end
+
+            docx.p do
+                style 'topTitle'
+                text '例：'
+                text v[0].issued_at.strftime('%m月%d日 %H时%M分')
+                text '在'
+                text Location.where(name: v[0].location.name)[0].parent.parent.name.to_s+'-'
+                text Location.where(name: v[0].location.name)[0].parent.name.to_s+'-'
+                text (v[0].location.name rescue '未填写')
+                text '发现了 "'
+                text (v[0].problem_category.name rescue '未指定问题类型')
+                text '" 问题。'
+                text (v[0].problem_status === 'correcting' ? ' [未整改]':' [已整改]')
+            end
+            docx.img image_url(url_for(v[0].problem_evidences.first.img)) do
+                width   320
+                height  200
+                align   :center
+                top     20
+                bottom  20
+                left    20
+                right   20
+            end rescue nil
+            docx.p
+            docx.p
+	    end
+	end
+	docx.p
+	docx.p
+    docx.p '四、督察工作建议' do
+	size 32
+	style 'nav'
+    end
+
+
+
+    docx.p '通过对本次督查数据分析，得出各地区仍存在以下多发问题： "'+@pro_category.to_s+'" 希望各地区对以上问题加大督查力度。' do
+        style 'nav'
+    end
+
+    docx.p '在本次督察工作开展中，发现疑似问题'+@resources.size.to_s+'个，确定问题'+@resources.where(problem_status: 'correcting'..'corrected').size.to_s+'个。望各地区大力展开督察工作，第一时间处置预警，及时整改问题。维稳督察大局，减少督察问题产生。' do
+        style 'nav'
+    end

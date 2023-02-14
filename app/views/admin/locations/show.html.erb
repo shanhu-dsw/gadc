@@ -1,0 +1,48 @@
+<%= content_for :right_content do %>
+  <div class="card mb-1">
+    <div class="card-header">
+      <h4 class="card-title">房间监控</h4>
+    </div>
+    <div class="card-body overflow-container" style="height: 80vh;overflow: scroll;">
+      <table class="table table-bordered">
+        <thead class="text-center text-danger">
+        <tr>
+          <td>监控快照</td>
+          <td>监控名称</td>
+          <td style="width: 15%">查看详情</td>
+        </tr>
+        </thead>
+        <tbody class="text-center">
+        <% @resource.cameras.order(created_at: :desc).each do |camera| %>
+          <tr>
+<!--            <td><%#= .to_json %></td>-->
+            <%= content_tag(:td, (image_tag camera.master_camera_capture.img_data[:src], width: '98%', class: 'image-preview' rescue nil)) %>
+            <td style="color: #1c8cf7!important;"><%= camera.name %></td>
+            <td style="color: #1c8cf7!important;"><%= link_to '查看', url_for({controller: 'admin/cameras', action: :show, id: camera.id }), target: '_blank' %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  </div>
+<% end %>
+
+<%= render 'manage/resources/show' do |resource| %>
+  <%= content_tag(:tr, content_tag(:td, Location.human_attribute_name(:name)) + content_tag(:td, resource.name)) %>
+  <%= content_tag(:tr, content_tag(:td, Location.human_attribute_name(:parent)) + content_tag(:td, (resource.parent.name rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, Location.human_attribute_name(:location_type)) + content_tag(:td, (t resource.location_type rescue '暂未设置'))) %>
+  <%= content_tag(:tr, content_tag(:td, Location.human_attribute_name(:physical)) + content_tag(:td, resource.physical === true ? '是' : '否')) %>
+  <tr>
+    <td>
+      <%= Location.human_attribute_name(:events) %>
+    </td>
+    <td>
+      <% resource.setting_events.each_with_index do |event, index| %>
+        <%= event.name %><%= resource.setting_events.length - index != 1 ? '、' : '' %>
+      <% end %>
+    </td>
+  </tr>
+  <%= content_tag(:tr, content_tag(:td, Location.human_attribute_name(:created_at)) + content_tag(:td, resource.created_at.strftime('20%y-%m-%d %H:%M:%S'))) %>
+<% end %>

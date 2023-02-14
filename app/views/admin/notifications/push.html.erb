@@ -1,0 +1,28 @@
+<script>
+    $(document).find('select.select2').not('.select2-hidden-accessible').select2();
+</script>
+<%= render 'layouts/manage/modal', modal_id: 'problem-push-modal', title: '编辑推送信息', size: 'lg' do %>
+  <%= form_with(model: @resource, url: { controller: :notifications, action: :create_push}, local: false, html: { class: 'form-resource' }) do |form| %>
+    <%= tag.div class: 'modal-body' do %>
+      <%= manage_hidden_field form, :admin_id, current_admin_user.source.id %>
+      <%= manage_hidden_field form, :name, @notification_name %>
+      <%= manage_hidden_field form, :url, @url %>
+
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>整改负责人</label><strong style="color:red"></strong>
+          <%= form.collection_select :receiver_id, Admin.all, :id, :full_name, { include_blank: '' }, class: 'form-control select2' %>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>附加信息</label><strong style="color:red"></strong>
+          <%= form.text_area :description, class: 'form-control' %>
+        </div>
+      </div>
+
+      <%= form.submit ('推送'), class: 'btn btn-success btn-block' %>
+    <% end %>
+  <% end %>
+<% end %>

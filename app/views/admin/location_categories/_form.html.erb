@@ -1,0 +1,9 @@
+<% content_for :information do %>
+  <%= tag.div class: 'row' do %>
+    <%= tag.div (manage_text_field form, :name), class: 'col-md-4' %>
+    <%= tag.div (manage_collection_select_field form, :parent_id, LocationCategory.all, :id, :name, { include_blank: true }), class: 'col-md-4' %>
+    <%= tag.div (manage_number_field form, :index), class: 'col-md-4' %>
+  <% end %>
+<% end %>
+
+<%= render 'manage/resources/form', form: form, sections: { information: '基本信息' } %>

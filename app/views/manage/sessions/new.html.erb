@@ -1,0 +1,36 @@
+<div class="content" style="margin-top: 20vh;">
+  <div class="container">
+    <div class="col-lg-4 col-md-6 ml-auto mr-auto">
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="card card-login card-white">
+          <div class="card-header text-center">
+            <img src="/admin/images/admin_logo.png" width="75px" alt="" class="mt-3">
+            <h3 class="text-dark m-4 p-0" style="font-size:26px;font-weight: 800">公安智慧督察系统</h3>
+          </div>
+          <div class="card-body">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  <i class="tim-icons icon-single-02"></i>
+                </div>
+              </div>
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control' if @config[:sessions][:authentication_key] == 'email' %>
+              <%= f.text_field :username, autofocus: true, autocomplete: "username", class: 'form-control' if @config[:sessions][:authentication_key] == 'username' %>
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  <i class="tim-icons icon-lock-circle"></i>
+                </div>
+              </div>
+              <%= f.password_field :password, autocomplete: "current-password", class: 'form-control' %>
+            </div>
+          </div>
+          <div class="card-footer">
+            <%= f.submit "登录", class: 'btn btn-info btn-lg btn-block mb-3' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="location-events-container">
+  <div class="map-container" id="location-events-map"></div>
+  <div class="events-box">
+    <div class="sidebar-title">
+      <%= link_to checkpoint_dashboard_index_path do %>
+        <img class="title-img d-inline-block" src="/checkpoint/images/back.png"/>
+      <% end %>
+      环京检查站信息
+    </div>
+    <div class="container-fluid">
+      <%= form_tag(url_for({}), method: :get) do %>
+        <div class="row" style="padding: 2vh 1vh 0 1vh">
+          <div class="col-2 search-input-container">
+            <p class="search-title">开始时间</p>
+            <%= text_field_tag :query_created_at_from, params[:query_created_at_from], class: 'date-select', type: 'datetime-local' %>
+          </div>
+
+          <div class="col-2 search-input-container">
+            <p class="search-title">结束时间</p>
+            <%= text_field_tag :query_created_at_to, params[:query_created_at_from], class: 'date-select', type: 'datetime-local' %>
+          </div>
+          <div class="col-2 search-input-container">
+            <p class="search-title">地级市选择</p>
+            <%= select_tag :query_location_id_1,
+                           options_from_collection_for_select(Location.query_location_level_name('地级市'), :id, :name, params[:query_location_id_1]),
+                           class: 'array-select', include_blank: '全部' %>
+          </div>
+          <div class="col-2 search-input-container">
+            <p class="search-title">区县选择</p>
+            <%= select_tag :query_location_id_2,
+                           options_from_collection_for_select(Location.query_location_level_name('区县'), :id, :name, params[:query_location_id_2]),
+                           class: 'array-select', include_blank: '全部' %>
+          </div>
+          <div class="col-2 search-input-container">
+            <p class="search-title">单位选择</p>
+            <%= select_tag :query_location_id_3,
+                           options_from_collection_for_select(Location.query_location_level_name('单位'), :id, :name, params[:query_location_id_2]),
+                           class: 'array-select', include_blank: '全部' %>
+          </div>
+          <div class="col-2 search-input-container">
+            <p class="search-title">预警类型</p>
+            <%= select_tag :query_event_id,
+                           options_from_collection_for_select(Event.where(name: ['未戴口罩', '未穿戴反光背心', '车辆拥堵', '单人拦检', '无人拦检', '引导分流民警不在岗', '执勤区民警不在岗']), :id, :name, params[:query_event_id]),
+                           class: 'array-select', include_blank: '全部' %>
+          </div>
+          <!--          <div class="col-2 search-input-container">-->
+          <!--            <p class="search-title">有效预警</p>-->
+          <!--            <select class="array-select">-->
+          <!--              <option value="XXX1">XXX1</option>-->
+          <!--              <option value="XXX2">XXX2</option>-->
+          <!--            </select>-->
+          <!--          </div>-->
+          <div class="col-12 mt-3 mb-2 d-flex align-items-center justify-content-center">
+            <%= submit_tag '搜索', class: 'search-btn' %>
+          </div>
+        </div>
+      <% end %>
+      <div class="row" style="padding: 1vh">
+
+        <% if @resources.size == 0 %>
+          <div class="col-md-12 text-center pt-5 mt-5">
+            <p class="text-white">暂时未找到符合条件的预警</p>
+          </div>
+        <% end %>
+
+        <% @resources.each do |location_event| %>
+          <div class="col-2">
+            <%= link_to url_for({ controller: 'checkpoint/location_events', action: :show, id: location_event.id }), target: '_blank' do %>
+              <div class="sidebar-card">
+                <div class="alert-card-title d-flex align-items-center">
+                  <div class="alert-card-title1">
+                    <img class="card-alert-img d-inline-block" src="/checkpoint/images/alert1.png"/>
+                    <!--                    <button class="btn btn-danger"><%#= location_event.event.name %></button>-->
+                    <%#= location_event.location.path.query_location_level_name('单位').first.name rescue nil %>
+                  </div>
+                  <div class="alert-card-title2 bg-danger"><%= location_event.event.name %></div>
+                </div>
+
+                <%= image_tag location_event.master_camera_capture.img_data[:src], class: 'alert-info-img' rescue nil %>
+                <div class="alert-card-title d-flex justify-content-between align-items-center" style="margin-top: 0.5vh; margin-bottom: 1vh;">
+                  <div class="alert-card-title1" style="font-size: 1.8vh">
+                    <%= location_event.location.path.query_location_level_name('单位').first.name rescue nil %>
+                  </div>
+                  <div class="d-flex" style="height: 2.5vh">
+                    <!--                    <div class="alert-card-title2 bg-danger"><%#= location_event.event.name %></div>&nbsp;-->
+                    <div class="alert-card-title2"><%= location_event.location.path.query_location_level_name('地级市').first.name rescue nil %></div>
+                  </div>
+                </div>
+                <div class="alert-info-text">抓拍时间：<span style="color: #d7d5d5;">
+                <%= location_event.created_at.strftime('%F %T') %></span>
+                </div>
+                <div class="alert-info-text">持续时间：<span style="color: #d7d5d5">
+                <%= distance_of_time_in_words(location_event.created_at, location_event.active_at, include_seconds: true) %></span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="col-12 pt-4">
+          <%= paginate @resources, views_prefix: 'manage' %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

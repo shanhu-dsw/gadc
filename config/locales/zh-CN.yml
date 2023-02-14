@@ -1,0 +1,311 @@
+zh-CN:
+  activerecord:
+    models:
+      location_event:
+        one: '预警'
+      location_level:
+        one: '场所等级'
+      location_category:
+        one: '场所类型'
+      bank:
+        one: '人像库'
+      person:
+        one: '人像'
+        two: '人像'
+      location:
+        one: '场所'
+      camera:
+        one: '摄像头'
+      camera_capture:
+        one: '抓拍'
+      event:
+        one: '事件'
+      admin:
+        one: '管理员'
+      engine:
+        one: '引擎'
+      problem:
+        one: '问题'
+      problem_category:
+        one: '问题类型'
+      portrait_search:
+        one: '人像搜索'
+      problem_evidence:
+        one: '问题图片'
+      upload:
+        one: '图像上传'
+      portrait:
+        one: '人像'
+      holiday:
+        one: '假期'
+      notification:
+        one: '通知'
+    attributes:
+      admin:
+        full_name: '姓名'
+        location_id: '地区'
+        created_at: '创建时间'
+        role:
+          one: '权限'
+          superadmin: "超级管理员"
+          admin: "管理员"
+          staff: "用户"
+      location:
+        name: '名称'
+        parent_id: '上级'
+        parent: '上级'
+        map: '地图'
+        event_locations: '事件类型'
+        physical: '是否拥有设备'
+        created_at: '创建时间'
+        events: '已设置事件'
+        location_level: '场所等级'
+        location_category_id: '场所类型'
+        location_level_id: '场所等级'
+        lat: '纬度'
+        lon: '经度'
+        setting_event_ids: '已设置事件'
+        location_type:
+          one: '场所属性'
+          police_station: '派出所'
+          checkpoint: '检查站'
+          prisons: '公安监所'
+      location_event:
+        length: '发生时长(分钟)'
+        type: '预警类型'
+        location_name: '预警地点'
+        verified: '是否审核'
+        active: '是否有效'
+        created_at: '创建时间'
+        updated_at: '更新时间'
+        active_at: '更新时间'
+        location_division_id: '单位'
+        location_id: '房间'
+        event_id: '预警类型'
+        problem_id: '生成问题ID'
+        master_camera_capture_id: '封面图片ID'
+      problem_category:
+        name: '名称'
+        parent_id: '上级'
+        parent: '上级'
+        created_at: '创建时间'
+        level:
+          one: '问题等级'
+          common: "普遍性问题"
+          general: "一般性问题"
+          serious: "严重性问题"
+      camera:
+        name: '名称'
+        rtsp: 'RTSP'
+        location: '场所'
+        location_id: '房间'
+        location_division_id: '单位'
+        master_camera_capture_id: "最新抓拍"
+        location_img: '场所图片'
+        marked: '已标注'
+        status:
+          one: '状态'
+          normal: "在线"
+          offline: "离线"
+          corrupted: "低质量"
+        created_at: '创建时间'
+        updated_at: '更新时间'
+      camera_capture:
+        location: '场所'
+        location_id: '房间'
+        camera_id: '摄像头'
+        engine_id: '引擎ID'
+        bodies_count: '检测躯体数'
+        portraits_count: '检测人像数'
+        location_division_id: '单位'
+        location_1: '地级市'
+        location_2: '区县'
+        location_3: '单位'
+        location_4: '房间'
+        camera: '摄像头'
+        created_at: '创建时间'
+        id: '图片ID'
+        img: '巡检图片'
+        location_category_ids: '场所类型'
+        location_category_id: '房间类型'
+      event:
+        name: '名称'
+        nickname: '昵称'
+        enabled: '是否激活'
+        confidence: '灵敏度'
+        interval: '合并间隔（分）'
+        created_at: '创建时间'
+        start_time: '开始时间'
+        end_time: '结束时间'
+        notify: '是否生成预警'
+        tolerance: '预警容忍时间（分）'
+        problem_tolerance: '问题容忍时间（分）'
+        problem_category1: '问题大类'
+        problem_category2: '问题中类'
+        problem_category3: '问题小类'
+        problem_category_id: '生成问题类型'
+        observation: '观察时间（分）'
+        if_holiday: '假期停止预警'
+        if_video: '录像回放'
+      user:
+        full_name: '姓名'
+        username: '用户姓名'
+        email: '邮箱'
+        password: '密码'
+        password_confirmation: '确认密码'
+        created_at: '创建时间'
+      engine:
+        full_name: '名称'
+        secret: '密钥'
+        internal_address: '内部地址'
+        external_address: '外部地址'
+        workers: '进程数'
+        params: '参数'
+        device: '设备'
+        created_at: '创建时间'
+        cached: '缓存'
+        engine_type:
+          one: '引擎类别'
+          vision: "分析引擎"
+          capture: "抓图引擎"
+      problem:
+        name: '名称'
+        parent_id: '上级'
+        parent: '上级'
+        level: '等级'
+        created_at: '创建时间'
+        problem_category_id: '问题类型'
+        problem_category: '问题类型'
+        location_id: '问题单位'
+        location: '问题单位'
+        img: '问题图片'
+        admin: '发现人'
+        admin_id: '创建人'
+        note: '备注信息'
+        issued_at: '问题时间'
+        active_at: '结束时间'
+        negated_admin: '无效负责人'
+        negated_at: '无效判断时间'
+        negated_note: '无效原因'
+        corrected_admin: '整改负责人'
+        corrected_at: '整改时间'
+        corrected_note: '整改说明'
+        reviewing_admin: '审核负责人'
+        reviewing_at: '审核时间'
+        reviewing_note: '审核说明'
+        problem_category1: '问题大类'
+        problem_category2: '问题中类'
+        problem_category3: '问题小类'
+        problem_category4: '问题细目'
+        discover_type:
+          one: '发现类型'
+          vision: '智能预警'
+          search: '极速巡查'
+          manual: '手动创建'
+          field: '现场督察'
+          other: '其它问题'
+        problem_status:
+          one: '问题状态'
+          waiting: '待审核'
+          correcting: '整改中'
+          corrected: '已整改'
+          negated: '无效问题'
+          reviewing: '上级审核'
+      location_category:
+        name: '名称'
+        parent: '上级'
+        index: '序号'
+        parent_id: '上级'
+      location_level:
+        name: '名称'
+      holiday:
+        off_date: '假期'
+      notification:
+        name: '通知标题'
+        description: '通知内容'
+        admin_id: '发布人'
+        created_at: '发布时间'
+
+  views:
+    pagination:
+      truncate: '...'
+      first: '第一页'
+      previous: '上一页'
+      next: '下一页'
+      last: '最后一页'
+    attributes:
+      admin:
+        role:
+          admin: 'Admin'
+          staff: 'Staff'
+      division:
+        name: "名称"
+        parent_id: "上一级"
+        lon: "经度"
+        lat: "纬度"
+      category:
+        name: "名称"
+        parent_id: "上一级"
+        level: "等级"
+      camera:
+        name: "名称"
+        division: "单位"
+        location_type: "类型"
+      operation:
+        request_content: "主要诉求"
+        response_content: "处理意见"
+        phone: "电话"
+        address: "地址"
+        operator: "值班员"
+      problem:
+        category: "分类"
+        division: "单位"
+  divisions: "单位"
+  categories: "问题类型"
+  problems: "问题"
+  cameras: "监控"
+  admins: "用户"
+  alerts: "督察预警"
+  duties: "值班"
+  notices: "通知"
+  inspections: "督察"
+  inspection_cameras: "督察摄像头"
+  edit: "编辑"
+  new: "新建"
+  Info: "通知信息"
+  settings: "用户"
+  engines: "引擎"
+  location_events: "预警"
+  events: "预警模型"
+  problem_categories: "问题类型"
+  locations: "单位"
+  superadmin: "超级管理员"
+  admin: "管理员"
+  staff: "用户"
+  common: "普遍性问题"
+  general: "一般性问题"
+  serious: "严重性问题"
+  role: "权限"
+  status: "状态"
+  normal: "在线"
+  offline: "离线"
+  corrupted: "低质量"
+  engine_type: "引擎类别"
+  level: "问题等级"
+  vision: '智能预警'
+  search: '极速巡查'
+  manual: '手动创建'
+  field: '现场督察'
+  other: '其它问题'
+  waiting: '待审核'
+  correcting: '整改中'
+  corrected: '已整改'
+  negated: '无效问题'
+  reviewing: '上级审核'
+  police_station: '派出所'
+  checkpoint: '检查站'
+  magazine: '武器库'
+  manage:
+    image_preview: '图片详情'
+
+

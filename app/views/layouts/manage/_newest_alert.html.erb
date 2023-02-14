@@ -1,0 +1,60 @@
+<!-- Alert Modal -->
+<div class="modal fade modal-black" id="newest-alert-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-danger">最新预警展示</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="color: #fc4f00!important;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-white">
+        <% @latest_location_events = LocationEvent.accessible_by(current_ability, :read).where(active: true).order(:created_at).last(7) %>
+
+        <% if @latest_location_events.size > 0 %>
+          <div class="table-full-width">
+            <table class="table">
+              <thead class="text-primary">
+              <tr>
+                <th>预警类型</th>
+                <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+                  <%= tag.th location_level.name %>
+                <% end %>
+                <th>预警时间</th>
+                <th>问题快照</th>
+                <th class="text-right">查看</th>
+              </tr>
+              </thead>
+              <tbody>
+              <% @latest_location_events.each do |location_event| %>
+                <tr>
+                  <td><%= (location_event.event.name rescue nil) %></td>
+                  <% LocationLevel.where('index > ?', current_admin_user.source.location.location_level.index).each do |location_level| %>
+                    <%= content_tag(:td, (location_event.location.path.where(location_level: location_level).first.name rescue nil)) %>
+                  <% end %>
+                  <td><%= (location_event.created_at.strftime('%F %T') rescue nil) %></td>
+                  <td><%= (image_tag location_event.master_camera_capture.img_data[:src], height: '80px', class: 'image-preview', 'data-capture-id': location_event.master_camera_capture.id rescue nil) %></td>
+                  <td class="text-right">
+                    <%= link_to url_for({ controller: 'admin/location_events', action: :show, id: location_event.id },), target: '_blank' do %>
+                      <div class="btn btn-success btn-sm">查看</div>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center text-info">
+            暂无预警数据
+          </div>
+        <% end %>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">返回</button>
+      </div>
+    </div>
+  </div>
+</div>

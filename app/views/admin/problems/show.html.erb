@@ -1,0 +1,194 @@
+<%= content_for :right_content do %>
+  <div class="card mb-1">
+    <div class="card-header">
+      <h4 class="card-title">抓拍记录</h4>
+    </div>
+    <div class="card-body overflow-container" style="height: 80vh;overflow: scroll;">
+      <% @resource.problem_evidences.order(created_at: :desc).each do |problem_evidence| %>
+        <div class="mb-4">
+          <%= image_tag problem_evidence.img_data[:src], width: '100%' rescue nil %>
+          <span class="badge badge-info mt-3"><%= problem_evidence.created_at.strftime('%F %T') %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if @resource.problem_status == 'corrected' %>
+  <%= content_for :right_content do %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="card-title">整改记录</h4>
+      </div>
+      <div class="card-body overflow-container" style="height: 80vh;overflow: scroll;">
+        <% @resource.problem_corrections.order(created_at: :desc).each do |problem_correction| %>
+          <div class="mb-4">
+            <%= image_tag problem_correction.img_data[:src], width: '100%' rescue nil %>
+            <span class="badge badge-info mt-3"><%= problem_correction.created_at.strftime('%F %T') %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @resource.problem_status == 'corrected' %>
+  <%= content_for :left_content do %>
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="card-title">整改信息</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped table-responsive-sm">
+          <tbody>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:corrected_admin)) + content_tag(:td, (@resource.corrected_admin rescue ''))) %>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:corrected_at)) + content_tag(:td, (@resource.corrected_at.strftime('%F %T') rescue ''))) %>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:corrected_note)) + content_tag(:td, (@resource.corrected_note rescue ''))) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @resource.reviewing_note %>
+  <%= content_for :left_content do %>
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="card-title">上级审核信息</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped table-responsive-sm">
+          <tbody>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:reviewing_admin)) + content_tag(:td, (@resource.reviewing_admin rescue ''))) %>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:reviewing_at)) + content_tag(:td, (@resource.reviewing_at.strftime('%F %T') rescue ''))) %>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:reviewing_note)) + content_tag(:td, (@resource.reviewing_note rescue ''))) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @resource.problem_status == 'negated' || @resource.problem_status == 'reviewing' %>
+  <%= content_for :left_content do %>
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="card-title">无效原因</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped table-responsive-sm">
+          <tbody>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:negated_admin)) + content_tag(:td, (@resource.negated_admin rescue ''))) %>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:negated_at)) + content_tag(:td, (@resource.negated_at.strftime('%F %T') rescue ''))) %>
+          <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:negated_note)) + content_tag(:td, (@resource.negated_note rescue ''))) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render 'manage/resources/show' do |resource| %>
+
+  <% resource.location.path.each do |location| %>
+    <%= content_tag(:tr, content_tag(:td, location.location_level.name) + content_tag(:td, (location.name rescue nil))) %>
+  <% end %>
+
+  <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:problem_category)) + content_tag(:td, (resource.problem_category.name rescue nil)), class: 'text-danger') %>
+  <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:admin)) + content_tag(:td, (resource.admin.full_name rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:discover_type)) + content_tag(:td, (t resource.discover_type rescue nil))) %>
+  <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:issued_at)) + content_tag(:td, resource.issued_at.strftime('%F %T'))) %>
+  <%= content_tag(:tr, content_tag(:td, Problem.human_attribute_name(:note)) + content_tag(:td, resource.note)) %>
+  <tr>
+    <td>预警信息</td>
+    <td>
+      <% alert_id = (resource.location_events[0].id rescue false) %>
+      <% if !alert_id %>
+        无预警信息
+      <% else %>
+        <%= link_to '查看预警', url_for({ controller: 'admin/location_events', action: :show, id: alert_id },), target: '_blank' %>
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <td>问题状态</td>
+    <td>
+      <div class="btn btn-sm btn-info ml-1"><%= (t resource.problem_status) %></div>
+    </td>
+  </tr>
+
+  <% if current_admin_user.source.role != 'staff' %>
+    <tr>
+      <td>
+        修改问题状态
+      </td>
+      <td>
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :problem_status, value: :correcting %>
+          <%= form.submit '更改为整改中', class: "btn btn-sm btn-danger float-left mx-1" %>
+        <% end if @resource.problem_status == 'waiting' || @resource.problem_status == 'corrected' %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= link_to '编辑整改信息', ({ action: :edit, view: 'correction' }), class: "btn btn-sm btn-warning float-left mx-1" %>
+        <% end if  @resource.problem_status == 'corrected' %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= link_to '申请为无效', ({ action: :edit, view: 'invalidp' }), class: "btn btn-sm btn-success float-left mx-1" %>
+        <% end if @resource.problem_status == 'waiting' %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= link_to '更改为已整改', ({ action: :edit, view: 'correction' }), class: "btn btn-sm btn-warning float-left mx-1" %>
+        <% end if @resource.problem_status == 'correcting' %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :problem_status, value: :waiting %>
+          <%= form.submit '更改为待核实', class: "btn btn-sm btn-primary float-left mx-1" %>
+        <% end if @resource.problem_status == 'correcting' && current_admin_user.source.role == 'superadmin' %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :problem_status, value: :waiting %>
+          <%= form.submit '撤销申请', class: "btn btn-sm btn-primary float-left mx-1 mt-2" %>
+        <% end if @resource.problem_status == 'reviewing' %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= link_to '编辑无效原因', ({ action: :edit, view: 'invalidp' }), class: "btn btn-sm btn-success float-left mx-1 mt-2" %>
+        <% end if @resource.problem_status == 'reviewing' %>
+
+        <% if can? :update, @resource %>
+
+          <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+            <%= link_to '审核有效', ({ action: :edit, view: 'reviewing' }), class: "btn btn-sm btn-warning float-left mx-1 mt-2" %>
+          <% end if @resource.problem_status == 'reviewing' if (can? :reviewing, @resource) %>
+
+          <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+            <%= form.hidden_field :problem_status, value: :negated %>
+            <%= form.submit '审核无效', class: "btn btn-sm btn-delete float-left mx-1 mt-2" %>
+          <% end if @resource.problem_status == 'reviewing' if (can? :reviewing, @resource) %>
+
+        <% end %>
+
+        <%= form_with(model: @resource, url: url_for({ action: :update }), html: { :'data-type' => 'json', class: 'form-resource' }, local: false,) do |form| %>
+          <%= form.hidden_field :problem_status, value: :waiting %>
+          <%= form.submit '更改为待核实', class: "btn btn-sm btn-primary float-left mx-1" %>
+        <% end if @resource.problem_status == 'negated' %>
+
+      </td>
+    </tr>
+  <% end %>
+
+  <tr>
+    <td>问题推送整改</td>
+    <td>
+      <div class="btn btn-sm btn-info problem-notification-push-btn ml-1" data-resource-id="<%= resource.id %>">将该问题推送给整改负责人</div>
+    </td>
+  </tr>
+
+<% end %>
+

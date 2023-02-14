@@ -1,0 +1,31 @@
+<% content_for :filter_form do %>
+  <%= tag.div class: 'row' do %>
+    <%= tag.div (manage_text_tag '名称', :query_name, params[:query_name]), class: 'col-md-4' %>
+    <%= tag.div (manage_select_tag '是否激活', :query_enabled, params[:query_enabled], { '是' => true, '否' => false }, include_blank: '全部'), class: 'col-md-4' %>
+  <% end %>
+<% end %>
+
+<% content_for :th do %>
+  <%= tag.th Event.human_attribute_name(:name) %>
+  <%= tag.th Event.human_attribute_name(:enabled) %>
+  <%= tag.th Event.human_attribute_name(:notify) %>
+  <%= tag.th Event.human_attribute_name(:confidence) %>
+  <%= tag.th Event.human_attribute_name(:tolerance) %>
+  <%= tag.th Event.human_attribute_name(:interval) %>
+  <%= tag.th Event.human_attribute_name(:problem_tolerance) %>
+  <%= tag.th Event.human_attribute_name(:observation) %>
+  <%= tag.th Event.human_attribute_name(:if_holiday) %>
+<% end %>
+
+
+<%= render 'manage/resources/index' do |resource| %>
+  <%= tag.td resource.name rescue '' %>
+  <%= tag.td resource.enabled === true ? '是' : '否' rescue '' %>
+  <%= tag.td resource.notify === true ? '是' : '否' rescue '' %>
+  <%= tag.td "#{(resource.confidence * 100).round}" + '%' rescue '' %>
+  <%= tag.td resource.tolerance rescue '' %>
+  <%= tag.td resource.interval rescue '' %>
+  <%= tag.td resource.problem_tolerance rescue '' %>
+  <%= tag.td resource.observation rescue '' %>
+  <%= tag.td (resource.if_holiday ? '是' : '否') rescue '' %>
+<% end %>

@@ -1,0 +1,17 @@
+<div class="modal fade modal-black" id="<%= modal_id %>" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" aria-modal="true">
+  <div class="modal-dialog <%= (local_assigns.has_key? :size) ? 'modal-' + size : '' %>">
+    <div class="modal-content">
+      <% if title %>
+        <div class="modal-header justify-content-center">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="tim-icons icon-simple-remove"></i>
+          </button>
+          <h4 class="title title-up"><%= title %></h4>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </div>
+  </div>
+</div>
